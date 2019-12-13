@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:reminder/features/calendar/presentation/widgets/w_table_calendar.dart';
 
 class Calendar extends StatefulWidget {
   Calendar({Key key}) : super(key: key);
@@ -9,24 +9,14 @@ class Calendar extends StatefulWidget {
 }
 
 class _CalendarState extends State<Calendar> {
-  var _calendarController;
   @override
   void initState() {
     super.initState();
-    _calendarController = CalendarController();
   }
 
   @override
   void dispose() {
-    _calendarController.dispose();
     super.dispose();
-  }
-
-  TableCalendar _buildCalendar() {
-    return TableCalendar(
-      availableCalendarFormats: {CalendarFormat.month: ""},
-      calendarController: _calendarController,
-    );
   }
 
   @override
@@ -35,7 +25,7 @@ class _CalendarState extends State<Calendar> {
       appBar: AppBar(
         title: Text("Pills reminder"),
       ),
-      body: _buildCalendar(),
+      body: WTableCalendar(),
     );
   }
 }
