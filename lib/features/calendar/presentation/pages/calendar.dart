@@ -22,15 +22,20 @@ class _CalendarState extends State<Calendar> {
     super.dispose();
   }
 
+  TableCalendar _buildCalendar() {
+    return TableCalendar(
+      availableCalendarFormats: {CalendarFormat.month: ""},
+      calendarController: _calendarController,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Pills reminder"),
       ),
-      body: TableCalendar(
-        calendarController: _calendarController,
-      ),
+      body: _buildCalendar(),
     );
   }
 }
