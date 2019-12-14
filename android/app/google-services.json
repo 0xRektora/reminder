@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "984826496534",
+    "firebase_url": "https://reminder-53ebc.firebaseio.com",
+    "project_id": "reminder-53ebc",
+    "storage_bucket": "reminder-53ebc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:984826496534:android:5939ee6a0a34de98119737",
+        "android_client_info": {
+          "package_name": "com.valinstudios.reminder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "984826496534-9n0n81p0l83q600v62g9mkauus23d8ks.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.valinstudios.reminder",
+            "certificate_hash": "4be19ecdbccedfdad71ee1635167173a6f135556"
+          }
+        },
+        {
+          "client_id": "984826496534-sj90c2tfc4fsqplrhq8ghko3r95n2gs3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWeToc2r90sBSbw_JV4oa75a2YF3WNwVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "984826496534-sj90c2tfc4fsqplrhq8ghko3r95n2gs3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
