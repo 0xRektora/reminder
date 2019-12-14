@@ -14,6 +14,9 @@ class _PrescriptionsState extends State<Prescriptions> {
       appBar: AppBar(
         title: Text("Prescriptions"),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+      ),
     );
   }
 }
