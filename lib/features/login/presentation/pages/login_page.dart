@@ -13,12 +13,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  Scaffold _buildPage(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-      ),
-      body: BlocProvider<LoginBloc>(
+  Container _buildPage(BuildContext context) {
+    return Container(
+      child: BlocProvider<LoginBloc>(
         create: (_) => sl<LoginBloc>(),
         child: Center(
           child: BlocBuilder<LoginBloc, LoginState>(

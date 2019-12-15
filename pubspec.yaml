@@ -20,6 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_sign_in: ^4.1.0
+  bottom_navy_bar: ^5.2.2
 
   firebase_auth: ^0.15.2
   table_calendar: ^2.2.1
