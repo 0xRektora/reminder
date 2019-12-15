@@ -3,4 +3,9 @@ class User {
   final String name;
 
   User(this.uid, this.name);
+
+  @override
+  String toString() {
+    return "UID : " + uid + ", Name : " + name;
+  }
 }

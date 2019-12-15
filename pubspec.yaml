@@ -19,10 +19,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_sign_in: ^4.1.0
+
+  firebase_auth: ^0.15.2
   table_calendar: ^2.2.1
   flutter_bloc: ^2.1.1
   equatable: ^1.0.1
-  firebase_auth: ^0.15.2
   meta: ^1.1.8
   get_it: ^3.0.3
   dartz: ^0.8.9
@@ -36,6 +38,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^4.1.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
