@@ -10,12 +10,20 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  Scaffold _buildPage() {
+    return Scaffold(
+      body: Container(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {},
       child: BlocBuilder<LoginBloc, LoginState>(
-        builder: (context, state) {},
+        builder: (context, state) {
+          return _buildPage();
+        },
       ),
     );
   }

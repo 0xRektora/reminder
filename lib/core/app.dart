@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reminder/features/calendar/presentation/pages/calendar.dart';
+import 'package:reminder/features/login/presentation/pages/login_page.dart';
 import 'package:reminder/features/prescriptions/presentation/pages/prescriptions.dart';
 
 class MyApp extends StatelessWidget {
@@ -8,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Prescriptions(),
+      home: LoginPage(),
     );
   }
 }
