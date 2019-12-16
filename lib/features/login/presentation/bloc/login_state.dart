@@ -22,6 +22,15 @@ class LoadedLoginState extends LoginState {
   List<Object> get props => [user];
 }
 
+class LoadedLoginFromCacheState extends LoginState {
+  final User user;
+
+  LoadedLoginFromCacheState({@required this.user});
+
+  @override
+  List<Object> get props => [user];
+}
+
 class ErrorLoginState extends LoginState {
   final String message;
 

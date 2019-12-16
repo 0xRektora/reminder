@@ -26,4 +26,14 @@ class LoginRepositoryImpl implements LoginRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, User>> loginFromCache(FirebaseAuth _auth) async {
+    try {
+      final user = await loginDataSource.loginFromCache(_auth);
+      return right(user);
+    } on ServerException {
+      return Left(ServerFailure());
+    }
+  }
 }

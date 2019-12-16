@@ -1,11 +1,15 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:reminder/core/static/c_s_styles.dart';
-import 'package:reminder/features/calendar/presentation/pages/calendar_page.dart';
-import 'package:reminder/features/prescriptions/presentation/pages/prescription_page.dart';
-import 'package:reminder/features/settings/presentation/pages/settings_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:reminder/core/bloc/app_bloc.dart';
+import 'package:reminder/core/bloc/app_state.dart';
+import 'package:reminder/dependency_injector.dart';
+import 'package:reminder/features/login/presentation/pages/login_page.dart';
 
-import '../features/login/presentation/pages/login_page.dart';
+import '../features/calendar/presentation/pages/calendar_page.dart';
+import '../features/prescriptions/presentation/pages/prescription_page.dart';
+import '../features/settings/presentation/pages/settings_page.dart';
+import 'static/c_s_styles.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
@@ -74,16 +78,10 @@ class _AppState extends State<App> {
 
   @override
   void initState() {
-    _pageController.addListener(() {
-      if (_pageController.page.toInt() != last_page) {
-        print("changing page" + _pageController.page.toInt().toString());
-      }
-    });
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Scaffold _buildApp(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Reminder"),
@@ -107,6 +105,27 @@ class _AppState extends State<App> {
               duration: Duration(milliseconds: 300), curve: Curves.ease);
         }),
         items: bottomNavBarItems,
+      ),
+    );
+  }
+
+  Scaffold _buildLogin(BuildContext context) {
+    return Scaffold(
+      body: LoginPage(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<AppBloc>(
+      create: (_) => sl<AppBloc>(),
+      child: BlocBuilder<AppBloc, AppState>(
+        builder: (context, state) {
+          if (state is AppLoggedState)
+            return _buildApp(context);
+          else
+            return _buildLogin(context);
+        },
       ),
     );
   }

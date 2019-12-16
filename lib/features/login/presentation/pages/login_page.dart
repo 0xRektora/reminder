@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:reminder/core/bloc/bloc.dart';
 
 import '../../../../dependency_injector.dart';
 import '../bloc/bloc.dart';
@@ -18,19 +20,34 @@ class _LoginPageState extends State<LoginPage> {
       child: BlocProvider<LoginBloc>(
         create: (_) => sl<LoginBloc>(),
         child: Center(
-          child: BlocBuilder<LoginBloc, LoginState>(
-            builder: (context, state) {
-              if (state is InitialLoginState)
-                return WLoginWithGoogle();
-              else if (state is LoadingLoginState)
-                return CircularProgressIndicator();
-              else if (state is ErrorLoginState)
-                return Text(state.message);
-              else if (state is LoadedLoginState)
-                return Text("User sign in : " + state.user.toString());
+          child: BlocListener<LoginBloc, LoginState>(
+            listener: (context, state) {
+              if (state is LoadedLoginState)
+                BlocProvider.of<AppBloc>(context)
+                    .add(AppLoggedEvent(state.user));
+              else if (state is LoadedLoginFromCacheState)
+                // Check if user is logged
+                // If exist dispatch bloc event to logged
+                BlocProvider.of<AppBloc>(context)
+                    .add(AppLoggedEvent(state.user));
               else
-                return WLoginWithGoogle();
+                BlocProvider.of<LoginBloc>(context)
+                    .add(LoadLoginUserFromCacheEvent());
             },
+            child: BlocBuilder<LoginBloc, LoginState>(
+              builder: (context, state) {
+                if (state is InitialLoginState)
+                  return WLoginWithGoogle();
+                else if (state is LoadingLoginState)
+                  return CircularProgressIndicator();
+                else if (state is ErrorLoginState)
+                  return Text(state.message);
+                else if (state is LoadedLoginState)
+                  return Text("User sign in : " + state.user.toString());
+                else
+                  return WLoginWithGoogle();
+              },
+            ),
           ),
         ),
       ),

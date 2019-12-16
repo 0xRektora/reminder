@@ -6,6 +6,7 @@ import 'package:reminder/features/login/data/models/login_model.dart';
 abstract class LoginDataSource {
   Future<UserModel> loginWithGoogle(
       GoogleSignIn _googleSignIn, FirebaseAuth _auth);
+  Future<UserModel> loginFromCache(FirebaseAuth _auth);
 }
 
 class LoginDataSourceImpl implements LoginDataSource {
@@ -24,6 +25,18 @@ class LoginDataSourceImpl implements LoginDataSource {
       final FirebaseUser user =
           (await _auth.signInWithCredential(credential)).user;
 
+      return UserModel.fromFirebaseUser(user);
+    } on Exception catch (e) {
+      print("ERROR feature/login/datasource/LoginDataSourceImpl: " +
+          e.toString());
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<UserModel> loginFromCache(FirebaseAuth _auth) async {
+    try {
+      final user = await _auth.currentUser();
       return UserModel.fromFirebaseUser(user);
     } on Exception catch (e) {
       print("ERROR feature/login/datasource/LoginDataSourceImpl: " +

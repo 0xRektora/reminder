@@ -8,4 +8,5 @@ import '../../../../core/error/failures.dart';
 abstract class LoginRepository {
   Future<Either<Failure, User>> loginWithGoogle(
       GoogleSignIn _googleSignIn, FirebaseAuth _auth);
+  Future<Either<Failure, User>> loginFromCache(FirebaseAuth _auth);
 }
