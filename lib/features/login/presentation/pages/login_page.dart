@@ -25,14 +25,6 @@ class _LoginPageState extends State<LoginPage> {
               if (state is LoadedLoginState)
                 BlocProvider.of<AppBloc>(context)
                     .add(AppLoggedEvent(state.user));
-              else if (state is LoadedLoginFromCacheState)
-                // Check if user is logged
-                // If exist dispatch bloc event to logged
-                BlocProvider.of<AppBloc>(context)
-                    .add(AppLoggedEvent(state.user));
-              else
-                BlocProvider.of<LoginBloc>(context)
-                    .add(LoadLoginUserFromCacheEvent());
             },
             child: BlocBuilder<LoginBloc, LoginState>(
               builder: (context, state) {

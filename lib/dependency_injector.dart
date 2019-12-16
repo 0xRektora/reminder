@@ -11,15 +11,20 @@ import 'features/login/domain/repositories/login_repository.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // Core
-  cApp();
   //Feature login
   fLogin();
+
+  // Core
+  cApp();
 }
 
 Future<void> cApp() async {
   // Bloc
-  sl.registerFactory(() => AppBloc());
+  sl.registerFactory(
+    () => AppBloc(
+      loginFromCacheUseCase: sl(),
+    ),
+  );
 }
 
 Future<void> fLogin() async {
@@ -27,7 +32,6 @@ Future<void> fLogin() async {
   sl.registerFactory(
     () => LoginBloc(
       loginWithGoogle: sl(),
-      loginFromCacheUseCase: sl(),
     ),
   );
 

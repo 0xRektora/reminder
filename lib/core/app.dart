@@ -1,14 +1,13 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/core/bloc/app_bloc.dart';
-import 'package:reminder/core/bloc/app_state.dart';
-import 'package:reminder/dependency_injector.dart';
-import 'package:reminder/features/login/presentation/pages/login_page.dart';
 
+import '../dependency_injector.dart';
 import '../features/calendar/presentation/pages/calendar_page.dart';
+import '../features/login/presentation/pages/login_page.dart';
 import '../features/prescriptions/presentation/pages/prescription_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
+import 'bloc/bloc.dart';
 import 'static/c_s_styles.dart';
 
 class MyApp extends StatelessWidget {
@@ -119,13 +118,23 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return BlocProvider<AppBloc>(
       create: (_) => sl<AppBloc>(),
-      child: BlocBuilder<AppBloc, AppState>(
-        builder: (context, state) {
-          if (state is AppLoggedState)
-            return _buildApp(context);
-          else
-            return _buildLogin(context);
+      child: BlocListener<AppBloc, AppState>(
+        listener: (context, state) {
+          // print("Listener called");
+          // if (state is InitialAppState)
+          //   BlocProvider.of<AppBloc>(context)
+          //       .add(LoadLoginUserFromCacheEvent());
         },
+        child: BlocBuilder<AppBloc, AppState>(
+          builder: (context, state) {
+            if (state is AppLoggedState)
+              return _buildApp(context);
+            else
+              BlocProvider.of<AppBloc>(context)
+                  .add(LoadLoginUserFromCacheEvent());
+            return _buildLogin(context);
+          },
+        ),
       ),
     );
   }
