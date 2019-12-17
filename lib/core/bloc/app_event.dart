@@ -16,6 +16,6 @@ class AppLoggedEvent extends AppEvent {
   List<Object> get props => [user];
 }
 
-class LoadLoginUserFromCacheEvent extends AppEvent {}
+class CAppLoadLoginUserFromCacheEvent extends AppEvent {}
 
 class AppDisconnectEvent extends AppEvent {}

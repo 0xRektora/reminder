@@ -10,13 +10,22 @@ import '../features/settings/presentation/pages/settings_page.dart';
 import 'bloc/bloc.dart';
 import 'static/c_s_styles.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key key}) : super(key: key);
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: App(),
+    return BlocProvider<AppBloc>(
+      create: (_) => sl<AppBloc>(),
+      child: MaterialApp(
+        home: App(),
+        theme: CSAppTheme.theme,
+      ),
     );
   }
 }
@@ -44,41 +53,36 @@ class _AppState extends State<App> {
     BottomNavyBarItem(
         icon: Icon(
           Icons.add_alert,
-          color: BottomNavBarStyle.iconColor,
+          color: CSBottomNavBarStyle.iconColor,
         ),
         title: Text(
           "Prescriptions",
-          style: BottomNavBarStyle.textStyle,
+          style: CSBottomNavBarStyle.textStyle,
         ),
-        activeColor: BottomNavBarStyle.activeColor),
+        activeColor: CSBottomNavBarStyle.activeColor),
     // Calendar
     BottomNavyBarItem(
         icon: Icon(
           Icons.calendar_today,
-          color: BottomNavBarStyle.iconColor,
+          color: CSBottomNavBarStyle.iconColor,
         ),
         title: Text(
           "Calendar",
-          style: BottomNavBarStyle.textStyle,
+          style: CSBottomNavBarStyle.textStyle,
         ),
-        activeColor: BottomNavBarStyle.activeColor),
+        activeColor: CSBottomNavBarStyle.activeColor),
     // Settings
     BottomNavyBarItem(
         icon: Icon(
           Icons.settings,
-          color: BottomNavBarStyle.iconColor,
+          color: CSBottomNavBarStyle.iconColor,
         ),
         title: Text(
           "Settings",
-          style: BottomNavBarStyle.textStyle,
+          style: CSBottomNavBarStyle.textStyle,
         ),
-        activeColor: BottomNavBarStyle.activeColor),
+        activeColor: CSBottomNavBarStyle.activeColor),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Scaffold _buildApp(BuildContext context) {
     return Scaffold(
@@ -116,26 +120,15 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AppBloc>(
-      create: (_) => sl<AppBloc>(),
-      child: BlocListener<AppBloc, AppState>(
-        listener: (context, state) {
-          // print("Listener called");
-          // if (state is InitialAppState)
-          //   BlocProvider.of<AppBloc>(context)
-          //       .add(LoadLoginUserFromCacheEvent());
-        },
-        child: BlocBuilder<AppBloc, AppState>(
-          builder: (context, state) {
-            if (state is AppLoggedState)
-              return _buildApp(context);
-            else
-              BlocProvider.of<AppBloc>(context)
-                  .add(LoadLoginUserFromCacheEvent());
-            return _buildLogin(context);
-          },
-        ),
-      ),
+    return BlocBuilder<AppBloc, AppState>(
+      builder: (context, state) {
+        if (state is AppLoggedState)
+          return _buildApp(context);
+        else if (state is CAppLoadingLoginState)
+          return Container(color: CSAppColors.PRIMARY_COLOR);
+        else
+          return _buildLogin(context);
+      },
     );
   }
 }

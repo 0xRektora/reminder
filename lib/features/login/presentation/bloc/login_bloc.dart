@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:reminder/core/static/c_s_shared_prefs.dart';
 import 'package:reminder/core/usecases/usecase.dart';
 import 'package:reminder/features/login/domain/usecases/login_with_google.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './bloc.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
@@ -24,8 +26,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           yield ErrorLoginState(message: "Can't login");
         },
         (user) async* {
-          yield LoadingLoginState();
+          yield FLoginLoadingLoginState();
           yield LoadedLoginState(user: user);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setBool(CSSharedPrefs.LOGGED_IN, true);
         },
       );
     }

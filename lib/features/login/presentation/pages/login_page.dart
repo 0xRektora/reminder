@@ -30,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
               builder: (context, state) {
                 if (state is InitialLoginState)
                   return WLoginWithGoogle();
-                else if (state is LoadingLoginState)
+                else if (state is FLoginLoadingLoginState)
                   return CircularProgressIndicator();
                 else if (state is ErrorLoginState)
                   return Text(state.message);

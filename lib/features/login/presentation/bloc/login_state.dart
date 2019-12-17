@@ -11,7 +11,7 @@ abstract class LoginState extends Equatable {
 
 class InitialLoginState extends LoginState {}
 
-class LoadingLoginState extends LoginState {}
+class FLoginLoadingLoginState extends LoginState {}
 
 class LoadedLoginState extends LoginState {
   final User user;

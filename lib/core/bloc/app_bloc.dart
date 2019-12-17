@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:reminder/core/usecases/usecase.dart';
-import 'package:reminder/features/login/domain/usecases/login_from_cache.dart';
+
 import './bloc.dart';
+import '../../features/login/domain/usecases/login_from_cache.dart';
+import '../usecases/usecase.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   LoginFromCacheUseCase loginFromCacheUseCase;
@@ -13,8 +15,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   AppBloc({
     @required this.loginFromCacheUseCase,
-  });
-
+  }) {
+    this.add(CAppLoadLoginUserFromCacheEvent());
+  }
   @override
   Stream<AppState> mapEventToState(
     AppEvent event,
@@ -22,7 +25,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (event is AppLoggedEvent) {
       yield AppLoggedState(event.user);
     }
-    if (event is LoadLoginUserFromCacheEvent) {
+    if (event is CAppLoadLoginUserFromCacheEvent) {
+      print("Loading from cache");
+      yield CAppLoadingLoginState();
       final usecase = await loginFromCacheUseCase(NoParams());
       yield* usecase.fold(
         (failure) async* {

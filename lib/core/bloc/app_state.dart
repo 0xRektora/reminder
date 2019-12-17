@@ -25,6 +25,8 @@ class LoadedLoginFromCacheState extends AppState {
   List<Object> get props => [user];
 }
 
+class CAppLoadingLoginState extends AppState {}
+
 class ErrorAppState extends AppState {
   final String message;
 
