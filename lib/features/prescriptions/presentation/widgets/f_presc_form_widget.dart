@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-
-import '../../../../core/static/c_s_styles.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class FPrescFormWidget extends StatefulWidget {
   FPrescFormWidget({Key key}) : super(key: key);
@@ -11,79 +9,138 @@ class FPrescFormWidget extends StatefulWidget {
 }
 
 class _FPrescFormWidgetState extends State<FPrescFormWidget> {
-  TextFormField pillName = TextFormField();
-  TextFormField total = TextFormField();
-  TextFormField current = TextFormField();
-  TextFormField qtyToTake = TextFormField();
-  TextFormField remindAt = TextFormField();
-  TextFormField remindWhen = TextFormField();
-  TextEditingController remindWhenController = TextEditingController();
+  FormBuilderTextField pillName = FormBuilderTextField(
+    attribute: "pillName",
+    maxLength: 25,
+    decoration: InputDecoration(
+      labelText: "Prescription name",
+      fillColor: Colors.white,
+    ),
+    validators: [
+      FormBuilderValidators.required(),
+    ],
+  );
+  FormBuilderTextField total = FormBuilderTextField(
+    attribute: "total",
+    decoration: InputDecoration(
+      labelText: "Total of prescription",
+      fillColor: Colors.white,
+    ),
+    validators: [
+      FormBuilderValidators.required(),
+      FormBuilderValidators.numeric(
+        errorText: "Must be a numeric value",
+      ),
+    ],
+  );
+  FormBuilderTextField current = FormBuilderTextField(
+    attribute: "current",
+    decoration: InputDecoration(
+      labelText: "Actually have",
+      fillColor: Colors.white,
+    ),
+    validators: [
+      FormBuilderValidators.required(),
+      FormBuilderValidators.numeric(
+        errorText: "Must be a numeric value",
+      ),
+    ],
+  );
 
-  @override
-  void initState() {
-    super.initState();
+  FormBuilderTextField qtyToTake = FormBuilderTextField(
+    attribute: "qtyToTake",
+    decoration: InputDecoration(
+      labelText: "Qty to take",
+      fillColor: Colors.white,
+    ),
+    validators: [
+      FormBuilderValidators.required(),
+      FormBuilderValidators.numeric(
+        errorText: "Must be a numeric value",
+      ),
+    ],
+  );
+  FormBuilderTextField remindAt = FormBuilderTextField(
+    attribute: "remindAt",
+    decoration: InputDecoration(
+      labelText: "Remind me at X number",
+      fillColor: Colors.white,
+    ),
+    validators: [
+      FormBuilderValidators.required(),
+      FormBuilderValidators.numeric(
+        errorText: "Must be a numeric value",
+      ),
+    ],
+  );
+  FormBuilderDateTimePicker remindWhen = FormBuilderDateTimePicker(
+    attribute: "reminWhen",
+    decoration: InputDecoration(
+      labelText: "Remind me when time is",
+      fillColor: Colors.white,
+    ),
+    inputType: InputType.time,
+    validators: [
+      FormBuilderValidators.required(),
+    ],
+  );
+
+  Widget _buildPillNameForm() {
+    return pillName;
   }
 
-  List<Widget> _formFields(BuildContext context) {
-    remindWhen = TextFormField(
-      readOnly: true,
-      controller: remindWhenController,
-      onTap: () {
-        DatePicker.showTimePicker(
-          context,
-          onConfirm: (date) {
-            remindWhenController.text =
-                "${date.hour}:${date.minute}:${date.second}";
-          },
-        );
-      },
+  Widget _buildTotalForm() {
+    return total;
+  }
+
+  Widget _buildCurrentForm() {
+    return current;
+  }
+
+  Widget _buildQtyToTakeForm() {
+    return qtyToTake;
+  }
+
+  Widget _buildRemindMeAtForm() {
+    return remindAt;
+  }
+
+  Widget _buildRemindMeWhenForm() {
+    return remindWhen;
+  }
+
+  FormBuilder _formBuilder(BuildContext context) {
+    return FormBuilder(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildPillNameForm(),
+          _buildTotalForm(),
+          _buildCurrentForm(),
+          _buildQtyToTakeForm(),
+          _buildRemindMeAtForm(),
+          _buildRemindMeWhenForm(),
+        ],
+      ),
     );
-    return [
-      Text("Pill name"),
-      pillName,
-      Text("Total amount"),
-      total,
-      Text("Current amount"),
-      current,
-      Text("Qty to take"),
-      qtyToTake,
-      Text("Remind me at"),
-      remindAt,
-      Text("Remind me when"),
-      remindWhen,
-    ];
-  }
-
-  List<Widget> _actionDialog(BuildContext context) {
-    return [
-      MaterialButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        child: Text("Ok"),
-        color: CSAppColors.PRIMARY_COLOR,
-      ),
-      MaterialButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        child: Text("Cancel"),
-        color: Colors.red,
-      ),
-    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      actions: _actionDialog(context),
-      content: Form(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _formFields(context),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Container(
+          height: 1,
+          color: Colors.grey,
+          margin: const EdgeInsets.only(left: 10.0, right: 10.0),
         ),
-      ),
+        SizedBox(
+          height: 40,
+        ),
+        _formBuilder(context),
+      ],
     );
   }
 }

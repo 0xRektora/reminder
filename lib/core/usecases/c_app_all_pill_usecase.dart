@@ -10,7 +10,9 @@ import 'usecase.dart';
 
 class CAppAllPillUsecase
     implements Usecase<List<FPPillEntity>, CAppGetAllPillParam> {
-  CDDbRepo cdDbRepo;
+  final CDDbRepo cdDbRepo;
+
+  CAppAllPillUsecase(this.cdDbRepo);
 
   @override
   // Call [CAppAllPillUsecase] with [CAppGetAllPillParam] as param

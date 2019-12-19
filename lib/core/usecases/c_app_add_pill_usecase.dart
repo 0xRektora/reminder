@@ -8,7 +8,9 @@ import '../error/failures.dart';
 import 'usecase.dart';
 
 class CAppAddPillUsecase implements Usecase<bool, CAppAddPillParams> {
-  CDDbRepo cdDbRepo;
+  final CDDbRepo cdDbRepo;
+
+  CAppAddPillUsecase(this.cdDbRepo);
 
   @override
   Future<Either<Failure, bool>> call(CAppAddPillParams params) {

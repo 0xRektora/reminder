@@ -7,7 +7,9 @@ import '../error/failures.dart';
 import 'usecase.dart';
 
 class CAppGetPillUsecase implements Usecase<FPPillEntity, CAppGetPillParam> {
-  CDDbRepo cdDbRepo;
+  final CDDbRepo cdDbRepo;
+
+  CAppGetPillUsecase(this.cdDbRepo);
 
   @override
   Future<Either<Failure, FPPillEntity>> call(params) async {
