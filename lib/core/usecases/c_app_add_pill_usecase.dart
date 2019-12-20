@@ -1,8 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:meta/meta.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 
-import '../data/models/c_d_app_pill_model.dart';
+import '../../features/prescriptions/domain/entities/f_pill_entity.dart';
 import '../domain/repositories/c_d_db_repo.dart';
 import '../error/failures.dart';
 import 'usecase.dart';

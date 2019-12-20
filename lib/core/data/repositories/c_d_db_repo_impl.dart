@@ -29,7 +29,7 @@ class CDDbRepoImpl implements CDDbRepo {
       return Right(result);
     } on ServerException {
       return Left(
-        ServerFailure(),
+        ServerFailure(message: "Usecase add pill error :"),
       );
     }
   }

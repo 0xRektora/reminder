@@ -37,6 +37,9 @@ class LoginDataSourceImpl implements LoginDataSource {
   Future<UserModel> loginFromCache(FirebaseAuth _auth) async {
     try {
       final user = await _auth.currentUser();
+      if (user == null) {
+        throw Exception("User cache null");
+      }
       return UserModel.fromFirebaseUser(user);
     } on Exception catch (e) {
       print("ERROR feature/login/datasource/LoginDataSourceImpl: " +

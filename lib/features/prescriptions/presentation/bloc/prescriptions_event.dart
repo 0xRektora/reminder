@@ -31,8 +31,9 @@ class FPrescDisplayAddPillEvent extends PrescriptionsEvent {}
 
 class FPrescAddPillEvent extends PrescriptionsEvent {
   final FPPillEntity pillEntity;
+  final String uid;
 
-  FPrescAddPillEvent({@required this.pillEntity});
+  FPrescAddPillEvent({@required this.pillEntity, @required this.uid});
 
   @override
   List<Object> get props => [pillEntity];

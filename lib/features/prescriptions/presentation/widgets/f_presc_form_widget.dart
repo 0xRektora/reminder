@@ -4,7 +4,8 @@ import '../../../../core/static/c_s_styles.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class FPrescFormWidget extends StatefulWidget {
-  final Function confirmCallBack;
+  final Function(BuildContext context, String pillName, int total, int current,
+      int qtyToTake, int remindAt, DateTime remindWhen) confirmCallBack;
   FPrescFormWidget(this.confirmCallBack, {Key key}) : super(key: key);
 
   @override
@@ -97,7 +98,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     ],
   );
   FormBuilderDateTimePicker remindWhen = FormBuilderDateTimePicker(
-    attribute: "reminWhen",
+    attribute: "remindWhen",
     keyboardType: TextInputType.datetime,
     decoration: InputDecoration(
       labelText: "Remind me when time is",
@@ -152,9 +153,22 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     ;
   }
 
-  void _confirmForm(Function callBack) {
+  Future<void> _confirmForm(context, Function callBack) async {
     if (_fbKey.currentState.saveAndValidate()) {
-      print("validated");
+      final pillNameValue =
+          _fbKey.currentState.fields["pillName"].currentState.value;
+      final totalValue =
+          int.parse(_fbKey.currentState.fields["total"].currentState.value);
+      final currentValue =
+          int.parse(_fbKey.currentState.fields["current"].currentState.value);
+      final qtyToTakeValue =
+          int.parse(_fbKey.currentState.fields["qtyToTake"].currentState.value);
+      final remindAtValue =
+          int.parse(_fbKey.currentState.fields["remindAt"].currentState.value);
+      final remindWhenValue =
+          _fbKey.currentState.fields["remindWhen"].currentState.value;
+      await callBack(context, pillNameValue, totalValue, currentValue,
+          qtyToTakeValue, remindAtValue, remindWhenValue);
     }
   }
 
@@ -178,7 +192,11 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
   List<DialogButton> _actionDialog(BuildContext context) {
     return [
       DialogButton(
-        onPressed: () => _confirmForm(widget.confirmCallBack),
+        onPressed: () {
+          _confirmForm(context, widget.confirmCallBack).then((_) {
+            Navigator.of(context).pop();
+          });
+        },
         child: Text(
           "Ok",
           style: TextStyle(color: Colors.white),

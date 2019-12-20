@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/core/static/c_s_styles.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
+import '../../../../core/bloc/app_bloc.dart';
+import '../../../../core/bloc/bloc.dart';
 import '../../../../dependency_injector.dart';
 import '../../domain/entities/f_pill_entity.dart';
 import '../bloc/bloc.dart';
@@ -34,17 +34,19 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       remindWhen: remindWhen,
       taken: false,
     );
-    BlocProvider.of<PrescriptionsBloc>(context)
-        .add(FPrescAddPillEvent(pillEntity: entity));
+    final appState = BlocProvider.of<AppBloc>(context).state;
+    if (appState is AppLoggedState) {
+      final uid = appState.user.uid;
+      BlocProvider.of<PrescriptionsBloc>(context)
+          .add(FPrescAddPillEvent(pillEntity: entity, uid: uid));
+    }
   }
 
   Container _buildPage(BuildContext context, List<Widget> widgets) {
     return Container(
       child: Stack(
         children: <Widget>[
-          FPrescFormWidget(() {
-            print("validate");
-          }),
+          FPrescFormWidget(_confirmDialog),
         ]..addAll(widgets),
       ),
     );

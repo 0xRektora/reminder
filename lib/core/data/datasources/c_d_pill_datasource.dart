@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:reminder/core/error/failures.dart';
 import 'package:reminder/core/static/c_s_db_routes.dart';
 import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 
@@ -17,15 +18,19 @@ class CDPillDatasourceImpl implements CDPillDatasource {
   @override
   Future<bool> addPill(
       {@required CDAppPillModel appPillModel, @required String uid}) async {
-    final result = await Firestore.instance
-        .collection(CSDbRoutes.PRESCRIPTIONS)
-        .document(uid)
-        .collection(CSDbPillDoc.PATH)
-        .add(appPillModel.toDoc());
-    if (result.documentID.length != 0) {
-      return true;
-    } else {
-      return false;
+    try {
+      final result = await Firestore.instance
+          .collection(CSDbRoutes.PRESCRIPTIONS)
+          .document(uid)
+          .collection(CSDbPillDoc.PATH)
+          .add(appPillModel.toDoc());
+      if (result.documentID.length != 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } on Exception catch (e) {
+      throw ServerFailure(message: e.toString());
     }
   }
 

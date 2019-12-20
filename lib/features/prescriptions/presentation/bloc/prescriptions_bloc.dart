@@ -53,7 +53,14 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
     }
 
     if (event is FPrescAddPillEvent) {
-      //TODO Add add pill event login
+      print("PillEvent");
+      final usecase = await cAppAddPillUsecase(
+          CAppAddPillParams(fpPillEntity: event.pillEntity, uid: event.uid));
+      yield* usecase.fold((failure) async* {
+        print("Error:${failure.message}");
+      }, (success) async* {
+        print("Success:${success}");
+      });
     }
   }
 }
