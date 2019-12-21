@@ -32,7 +32,14 @@ class FPrescShowPillState extends PrescriptionsState {
   List<Object> get props => [pillEntity];
 }
 
-class FPrescAddPillState extends PrescriptionsState {}
+class FPrescAddPillState extends PrescriptionsState {
+  final String uid;
+
+  FPrescAddPillState({@required this.uid});
+
+  @override
+  List<Object> get props => [uid];
+}
 
 class FPrescDisplayAddPillState extends PrescriptionsState {}
 

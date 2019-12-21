@@ -27,6 +27,7 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
     PrescriptionsEvent event,
   ) async* {
     if (event is FPrescListPillEvent) {
+      print("ListPills");
       final listPills =
           await cAppAllPillUsecase(CAppGetAllPillParam(uid: event.uid));
       yield* listPills.fold(
@@ -60,6 +61,7 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
         print("Error:${failure.message}");
       }, (success) async* {
         print("Success:${success}");
+        yield FPrescAddPillState(uid: event.uid);
       });
     }
   }

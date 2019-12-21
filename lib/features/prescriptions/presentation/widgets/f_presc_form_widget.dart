@@ -153,7 +153,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     ;
   }
 
-  Future<void> _confirmForm(context, Function callBack) async {
+  Future<bool> _confirmForm(context, Function callBack) async {
     if (_fbKey.currentState.saveAndValidate()) {
       final pillNameValue =
           _fbKey.currentState.fields["pillName"].currentState.value;
@@ -169,6 +169,9 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
           _fbKey.currentState.fields["remindWhen"].currentState.value;
       await callBack(context, pillNameValue, totalValue, currentValue,
           qtyToTakeValue, remindAtValue, remindWhenValue);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -193,8 +196,10 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     return [
       DialogButton(
         onPressed: () {
-          _confirmForm(context, widget.confirmCallBack).then((_) {
-            Navigator.of(context).pop();
+          _confirmForm(context, widget.confirmCallBack).then((success) {
+            if (success) {
+              Navigator.of(context).pop();
+            }
           });
         },
         child: Text(

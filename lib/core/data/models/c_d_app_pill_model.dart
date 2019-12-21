@@ -27,25 +27,28 @@ class CDAppPillModel {
       CSDbPillDoc.CURRENT: this.current,
       CSDbPillDoc.QTY_TO_TAKE: this.qtyToTake,
       CSDbPillDoc.REMIND_AT: this.remindAt,
-      CSDbPillDoc.REMIND_WHEN: this.remindWhen,
+      CSDbPillDoc.REMIND_WHEN:
+          "${this.remindWhen.hour}:${this.remindWhen.minute.toString().padLeft(2, '0')}",
       CSDbPillDoc.TAKEN: this.taken,
     };
   }
 
   factory CDAppPillModel.fromSnapshot(Map<String, dynamic> ds) {
+    // TODO test the string to datetime
     return CDAppPillModel(
       pillName: ds[CSDbPillDoc.PILLNAME],
       total: ds[CSDbPillDoc.TOTAL],
       current: ds[CSDbPillDoc.CURRENT],
       qtyToTake: ds[CSDbPillDoc.QTY_TO_TAKE],
       remindAt: ds[CSDbPillDoc.REMIND_AT],
-      remindWhen: ds[CSDbPillDoc.REMIND_WHEN],
+      remindWhen:
+          DateTime.parse("1970-01-01 ${ds[CSDbPillDoc.REMIND_WHEN]}:00.00"),
       taken: ds[CSDbPillDoc.TAKEN],
     );
   }
 
   static List<CDAppPillModel> fromListSnapshot(
       List<Map<String, dynamic>> listDs) {
-    return listDs.map((ds) => CDAppPillModel.fromSnapshot(ds));
+    return listDs.map((ds) => CDAppPillModel.fromSnapshot(ds)).toList();
   }
 }
