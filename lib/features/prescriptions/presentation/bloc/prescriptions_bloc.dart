@@ -32,8 +32,9 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
   ) async* {
     if (event is FPrescListPillEvent) {
       print("ListPillsEvent");
-      final listPills =
-          await cAppAllPillUsecase(CAppGetAllPillParam(uid: event.uid));
+      final listPills = await cAppAllPillUsecase(
+        CAppGetAllPillParam(uid: event.uid),
+      );
       yield* listPills.fold(
         (failure) async* {
           yield InitialPrescriptionsState();
@@ -69,6 +70,7 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
       yield* usecase.fold(
         (failure) async* {
           print("Error:${failure.message}");
+          yield FPrescDeletePillState(uid: event.uid);
         },
         (result) async* {
           yield FPrescDeletePillState(uid: event.uid);
@@ -87,6 +89,7 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
       yield* usecase.fold(
         (failure) async* {
           print("Error:${failure.message}");
+          yield FPrescAddPillState(uid: event.uid);
         },
         (success) async* {
           print("Success:${success}");
