@@ -1,6 +1,10 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
+import 'package:reminder/features/reminder_schedule/domain/usecases/f_reminder_schedule_set_usecase.dart';
 
 import '../dependency_injector.dart';
 import '../features/calendar/presentation/pages/calendar_page.dart';
@@ -18,6 +22,33 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+
+  Future<void> _onSelectNotification(String t) {
+    print("onSelectNotification" + t);
+
+    return null;
+  }
+
+  Future<void> _initLocalNotif() {
+    final initializationSettingsAndroid =
+        new AndroidInitializationSettings('ic_launcher');
+    // IOS not needed
+    final initializationSettingsIOS = IOSInitializationSettings();
+    final initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (t) => _onSelectNotification(t));
+    return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _flutterLocalNotificationsPlugin = sl<FlutterLocalNotificationsPlugin>();
+    _initLocalNotif();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<AppBloc>(
@@ -116,6 +147,16 @@ class _AppState extends State<App> {
     return Scaffold(
       body: LoginPage(),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Testing purpose
+    final _time = Time(19, 58, 10);
+    final _provider = sl<FlutterLocalNotificationsPlugin>();
+    sl<FReminderScheduleSetUsecase>().call(FReminderScheduleSetUsecaseParam(
+        flutterLocalNotificationsPlugin: _provider, time: _time));
   }
 
   @override

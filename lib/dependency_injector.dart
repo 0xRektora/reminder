@@ -1,3 +1,4 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 
 import 'core/bloc/app_bloc.dart';
@@ -14,17 +15,24 @@ import 'features/login/domain/usecases/login_from_cache.dart';
 import 'features/login/domain/usecases/login_with_google.dart';
 import 'features/login/presentation/bloc/bloc.dart';
 import 'features/prescriptions/presentation/bloc/bloc.dart';
+import 'features/reminder_schedule/data/repositories/f_reminder_schedule_repo_impl.dart';
+import 'features/reminder_schedule/domain/repositories/f_reminder_schedule_repo.dart';
+import 'features/reminder_schedule/domain/usecases/f_reminder_schedule_set_usecase.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // Core
+  cApp();
+
+  // Feature Reminder Schedule
+  fReminderSchedule();
+
   // Feature login
   fLogin();
 
   // Feature Prescriptions
   fPresc();
-  // Core
-  cApp();
 }
 
 Future<void> cApp() async {
@@ -54,9 +62,27 @@ Future<void> cApp() async {
   );
 
   // Datasource
-
   sl.registerLazySingleton<CDPillDatasource>(
     () => CDPillDatasourceImpl(),
+  );
+
+  // Local Notification
+  sl.registerLazySingleton<FlutterLocalNotificationsPlugin>(
+    () => FlutterLocalNotificationsPlugin(),
+  );
+}
+
+Future<void> fReminderSchedule() async {
+  // Usecase
+  sl.registerLazySingleton(
+    () => FReminderScheduleSetUsecase(
+      reminderScheduleRepo: sl(),
+    ),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<FReminderScheduleRepo>(
+    () => FReminderScheduleRepoImpl(),
   );
 }
 
