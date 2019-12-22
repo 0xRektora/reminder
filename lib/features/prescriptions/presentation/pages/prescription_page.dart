@@ -65,6 +65,18 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     );
   }
 
+  void _deletePill(BuildContext context, String pillName) {
+    final appState = BlocProvider.of<AppBloc>(context).state;
+    if (appState is AppLoggedState) {
+      BlocProvider.of<PrescriptionsBloc>(context).add(
+        FPrescDeletePillEvent(
+          pillName: pillName,
+          uid: appState.user.uid,
+        ),
+      );
+    }
+  }
+
   Widget _blocBuilder(BuildContext context) {
     return BlocListener<PrescriptionsBloc, PrescriptionsState>(
       child: BlocBuilder<PrescriptionsBloc, PrescriptionsState>(
@@ -81,6 +93,9 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
             final List<FPrescTileWidget> tiles = state.allPill
                 .map(
                   (pillEntity) => FPrescTileWidget(
+                    deleteAction: (String pillName) {
+                      _deletePill(context, pillName);
+                    },
                     title: pillEntity.pillName,
                   ),
                 )
@@ -92,6 +107,9 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       ),
       listener: (BuildContext context, PrescriptionsState state) {
         if (state is FPrescAddPillState)
+          BlocProvider.of<PrescriptionsBloc>(context)
+              .add(FPrescListPillEvent(uid: state.uid));
+        if (state is FPrescDeletePillState)
           BlocProvider.of<PrescriptionsBloc>(context)
               .add(FPrescListPillEvent(uid: state.uid));
       },

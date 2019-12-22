@@ -1,10 +1,8 @@
-import 'package:meta/meta.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:reminder/core/error/exceptions.dart';
-import 'package:reminder/core/error/failures.dart';
-import 'package:reminder/core/static/c_s_db_routes.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
+import 'package:meta/meta.dart';
 
+import '../../error/exceptions.dart';
+import '../../static/c_s_db_routes.dart';
 import '../models/c_d_app_pill_model.dart';
 
 abstract class CDPillDatasource {
@@ -28,7 +26,7 @@ class CDPillDatasourceImpl implements CDPillDatasource {
           .document(appPillModel.pillName)
           .setData(appPillModel.toDoc());
       return true;
-    } on Exception catch (e) {
+    } on ServerException catch (e) {
       throw ServerException(message: e.toString());
     }
   }

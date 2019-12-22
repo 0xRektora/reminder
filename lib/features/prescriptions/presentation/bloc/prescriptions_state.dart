@@ -32,6 +32,15 @@ class FPrescShowPillState extends PrescriptionsState {
   List<Object> get props => [pillEntity];
 }
 
+class FPrescDeletePillState extends PrescriptionsState {
+  final String uid;
+
+  FPrescDeletePillState({@required this.uid});
+
+  @override
+  List<Object> get props => [uid];
+}
+
 class FPrescAddPillState extends PrescriptionsState {
   final String uid;
 

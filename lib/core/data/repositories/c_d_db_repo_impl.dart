@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:meta/meta.dart';
 import 'package:reminder/core/error/exceptions.dart';
+import 'package:reminder/core/usecases/c_app_delete_pill_usecase.dart';
 import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 
 import '../../domain/repositories/c_d_db_repo.dart';
@@ -69,6 +70,24 @@ class CDDbRepoImpl implements CDDbRepo {
     } on ServerException {
       return Left(
         ServerFailure(),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> deletePill(
+      CAppDeletePillParam cAppDeletePillParam) async {
+    try {
+      final result = await cdPillDatasource.deletePill(
+        pillName: cAppDeletePillParam.pillName,
+        uid: cAppDeletePillParam.uid,
+      );
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(
+        ServerFailure(
+          message: e.toString(),
+        ),
       );
     }
   }

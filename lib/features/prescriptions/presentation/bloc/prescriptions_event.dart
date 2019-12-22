@@ -21,6 +21,16 @@ class FPrescChangePillEvent extends PrescriptionsEvent {
   List<Object> get props => [pillEntity];
 }
 
+class FPrescDeletePillEvent extends PrescriptionsEvent {
+  final String uid;
+  final String pillName;
+
+  FPrescDeletePillEvent({@required this.uid, @required this.pillName});
+
+  @override
+  List<Object> get props => [uid, pillName];
+}
+
 class FPrescListPillEvent extends PrescriptionsEvent {
   final String uid;
 

@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
+import 'package:reminder/core/usecases/c_app_delete_pill_usecase.dart';
 
 import 'core/bloc/app_bloc.dart';
 import 'core/data/datasources/c_d_pill_datasource.dart';
@@ -56,6 +57,10 @@ Future<void> cApp() async {
     () => CAppGetPillUsecase(sl()),
   );
 
+  sl.registerLazySingleton(
+    () => CAppDeletePillUsecase(sl()),
+  );
+
   // Repository
   sl.registerLazySingleton<CDDbRepo>(
     () => CDDbRepoImpl(cdPillDatasource: sl()),
@@ -93,6 +98,7 @@ Future<void> fPresc() async {
       cAppAddPillUsecase: sl(),
       cAppAllPillUsecase: sl(),
       cAppGetPillUsecase: sl(),
+      cAppDeletePillUsecase: sl(),
     ),
   );
 }
