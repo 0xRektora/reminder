@@ -14,10 +14,12 @@ class FPrescTileWidget extends StatefulWidget {
   _FPrescTileWidgetState createState() => _FPrescTileWidgetState();
 }
 
-// TODO Add slidable
 class _FPrescTileWidgetState extends State<FPrescTileWidget> {
-  final TextStyle _textStyle = TextStyle(fontSize: 21);
-  final double _padding = 10.0;
+  final TextStyle _textStyle = TextStyle(
+    fontSize: 21,
+    fontWeight: FontWeight.normal,
+  );
+  final double _padding = 20.0;
 
   IconSlideAction _deleteAction() {
     return IconSlideAction(
@@ -39,13 +41,19 @@ class _FPrescTileWidgetState extends State<FPrescTileWidget> {
           secondaryActions: <Widget>[
             _deleteAction(),
           ],
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(_padding),
-            child: Text(
-              widget.title,
-              style: _textStyle,
+          child: FlatButton(
+            onLongPress: () {
+              print("Long Press");
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(_padding),
+              child: Text(
+                widget.title,
+                style: _textStyle,
+              ),
             ),
+            onPressed: () {},
           )),
     );
   }
