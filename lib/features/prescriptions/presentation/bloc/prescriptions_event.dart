@@ -10,7 +10,15 @@ abstract class PrescriptionsEvent extends Equatable {
   List<Object> get props => null;
 }
 
-class FPrescShowPillEvent extends PrescriptionsEvent {}
+class FPrescShowPillEvent extends PrescriptionsEvent {
+  final String uid;
+  final String pillName;
+
+  FPrescShowPillEvent({@required this.uid, @required this.pillName});
+
+  @override
+  List<Object> get props => [uid, pillName];
+}
 
 class FPrescChangePillEvent extends PrescriptionsEvent {
   final FPPillEntity pillEntity;
