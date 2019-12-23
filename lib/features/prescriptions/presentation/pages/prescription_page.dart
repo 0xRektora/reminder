@@ -16,7 +16,6 @@ class PrescriptionPage extends StatefulWidget {
   _PrescriptionPageState createState() => _PrescriptionPageState();
 }
 
-// TODO show pill and make change
 class _PrescriptionPageState extends State<PrescriptionPage> {
   Future<void> _confirmDialog(
     BuildContext context,
@@ -50,7 +49,9 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         return tiles[index];
       },
       itemCount: tiles.length,
-      separatorBuilder: (BuildContext context, int index) => const Divider(),
+      separatorBuilder: (BuildContext context, int index) => const Divider(
+        height: 0,
+      ),
     );
   }
 
@@ -77,42 +78,55 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     }
   }
 
+  Widget isInitialPrescriptionsStateEvent(BuildContext context) {
+    final appState = BlocProvider.of<AppBloc>(context).state;
+    if (appState is AppLoggedState) {
+      BlocProvider.of<PrescriptionsBloc>(context)
+          .add(FPrescListPillEvent(uid: appState.user.uid));
+    }
+
+    return _buildPage(context, []);
+  }
+
+  Widget isFprescListPillStateEvent(
+      BuildContext context, FprescListPillState featureState) {
+    final List<FPrescTileWidget> tiles = featureState.allPill
+        .map(
+          (pillEntity) => FPrescTileWidget(
+            deleteAction: (String pillName) {
+              _deletePill(context, pillName);
+            },
+            title: pillEntity.pillName,
+          ),
+        )
+        .toList();
+    return _buildPage(context, [_buildPresc(tiles)]);
+  }
+
+  Widget _featureBlocBuilder(BuildContext context, PrescriptionsState state) {
+    if (state is InitialPrescriptionsState)
+      return isInitialPrescriptionsStateEvent(context);
+    else if (state is FprescListPillState)
+      return isFprescListPillStateEvent(context, state);
+    else
+      return _buildPage(context, []);
+  }
+
+  void _featureBlocListener(BuildContext context, PrescriptionsState state) {
+    if (state is FPrescAddPillState)
+      BlocProvider.of<PrescriptionsBloc>(context)
+          .add(FPrescListPillEvent(uid: state.uid));
+    if (state is FPrescDeletePillState)
+      BlocProvider.of<PrescriptionsBloc>(context)
+          .add(FPrescListPillEvent(uid: state.uid));
+  }
+
   Widget _blocBuilder(BuildContext context) {
     return BlocListener<PrescriptionsBloc, PrescriptionsState>(
       child: BlocBuilder<PrescriptionsBloc, PrescriptionsState>(
-        builder: (BuildContext context, PrescriptionsState state) {
-          if (state is InitialPrescriptionsState) {
-            final appState = BlocProvider.of<AppBloc>(context).state;
-            if (appState is AppLoggedState) {
-              BlocProvider.of<PrescriptionsBloc>(context)
-                  .add(FPrescListPillEvent(uid: appState.user.uid));
-            }
-
-            return _buildPage(context, []);
-          } else if (state is FprescListPillState) {
-            final List<FPrescTileWidget> tiles = state.allPill
-                .map(
-                  (pillEntity) => FPrescTileWidget(
-                    deleteAction: (String pillName) {
-                      _deletePill(context, pillName);
-                    },
-                    title: pillEntity.pillName,
-                  ),
-                )
-                .toList();
-            return _buildPage(context, [_buildPresc(tiles)]);
-          } else
-            return _buildPage(context, []);
-        },
+        builder: _featureBlocBuilder,
       ),
-      listener: (BuildContext context, PrescriptionsState state) {
-        if (state is FPrescAddPillState)
-          BlocProvider.of<PrescriptionsBloc>(context)
-              .add(FPrescListPillEvent(uid: state.uid));
-        if (state is FPrescDeletePillState)
-          BlocProvider.of<PrescriptionsBloc>(context)
-              .add(FPrescListPillEvent(uid: state.uid));
-      },
+      listener: _featureBlocListener,
     );
   }
 
