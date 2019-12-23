@@ -47,7 +47,20 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
     }
 
     if (event is FPrescShowPillEvent) {
-      //TODO Add show pill event login
+      final showPill = await cAppGetPillUsecase(CAppGetPillParam(
+        pillName: event.pillName,
+        uid: event.uid,
+      ));
+
+      yield* showPill.fold(
+        (failure) async* {
+          print("Error:${failure.message}");
+          yield InitialPrescriptionsState();
+        },
+        (success) async* {
+          yield FPrescShowPillState(pillEntity: success);
+        },
+      );
     }
 
     if (event is FPrescDisplayAddPillEvent) {
