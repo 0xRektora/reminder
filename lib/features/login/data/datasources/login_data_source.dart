@@ -29,7 +29,7 @@ class LoginDataSourceImpl implements LoginDataSource {
     } on Exception catch (e) {
       print("ERROR feature/login/datasource/LoginDataSourceImpl: " +
           e.toString());
-      throw ServerException();
+      throw ServerException(message: e.toString());
     }
   }
 
@@ -44,7 +44,7 @@ class LoginDataSourceImpl implements LoginDataSource {
     } on Exception catch (e) {
       print("ERROR feature/login/datasource/LoginDataSourceImpl: " +
           e.toString());
-      throw ServerException();
+      throw ServerException(message: e.toString());
     }
   }
 }
