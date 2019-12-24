@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 import 'package:reminder/core/static/c_s_db_routes.dart';
+import 'package:reminder/core/utils/c_app_converter.dart';
 
 class CDAppPillModel {
   final String pillName;
@@ -28,7 +29,7 @@ class CDAppPillModel {
       CSDbPillDoc.QTY_TO_TAKE: this.qtyToTake,
       CSDbPillDoc.REMIND_AT: this.remindAt,
       CSDbPillDoc.REMIND_WHEN:
-          "${this.remindWhen.hour}:${this.remindWhen.minute.toString().padLeft(2, '0')}",
+          CAppConverter.fromDatetimeToString(this.remindWhen),
       CSDbPillDoc.TAKEN: this.taken,
     };
   }
@@ -42,7 +43,7 @@ class CDAppPillModel {
       qtyToTake: ds[CSDbPillDoc.QTY_TO_TAKE],
       remindAt: ds[CSDbPillDoc.REMIND_AT],
       remindWhen:
-          DateTime.parse("1970-01-01 ${ds[CSDbPillDoc.REMIND_WHEN]}:00.00"),
+          CAppConverter.fromStringToDatetime(ds[CSDbPillDoc.REMIND_WHEN]),
       taken: ds[CSDbPillDoc.TAKEN],
     );
   }
