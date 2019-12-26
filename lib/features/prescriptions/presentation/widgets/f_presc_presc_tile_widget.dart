@@ -3,11 +3,13 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 class FPrescTileWidget extends StatefulWidget {
   final String title;
+  final Function() onLongPress;
   final Function(String pillName) deleteAction;
   FPrescTileWidget({
     Key key,
     @required this.title,
     @required this.deleteAction,
+    @required this.onLongPress,
   }) : super(key: key);
 
   @override
@@ -36,25 +38,24 @@ class _FPrescTileWidgetState extends State<FPrescTileWidget> {
   Widget build(BuildContext context) {
     return Container(
       child: Slidable(
-          actionExtentRatio: 0.25,
-          actionPane: SlidableDrawerActionPane(),
-          secondaryActions: <Widget>[
-            _deleteAction(),
-          ],
-          child: FlatButton(
-            onLongPress: () {
-              print("Long Press");
-            },
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(_padding),
-              child: Text(
-                widget.title,
-                style: _textStyle,
-              ),
+        actionExtentRatio: 0.25,
+        actionPane: SlidableDrawerActionPane(),
+        secondaryActions: <Widget>[
+          _deleteAction(),
+        ],
+        child: FlatButton(
+          onLongPress: widget.onLongPress,
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(_padding),
+            child: Text(
+              widget.title,
+              style: _textStyle,
             ),
-            onPressed: () {},
-          )),
+          ),
+          onPressed: () {}, // Do nothing
+        ),
+      ),
     );
   }
 }
