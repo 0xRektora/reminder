@@ -46,7 +46,10 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
   ListView _buildPresc(List<FPrescTileWidget> tiles) {
     return ListView.separated(
       itemBuilder: (BuildContext context, int index) {
-        return tiles[index];
+        return FPrescFormWidget(
+          _confirmDialog,
+          widgetBind: _tilePresc(context, tiles[index]),
+        );
       },
       itemCount: tiles.length,
       separatorBuilder: (BuildContext context, int index) => const Divider(
@@ -60,10 +63,42 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       child: Stack(
         children: <Widget>[
           ...widgets,
-          FPrescFormWidget(_confirmDialog),
+          FPrescFormWidget(
+            _confirmDialog,
+            widgetBind: _positionedButton,
+          ),
         ],
       ),
     );
+  }
+
+  Widget _tilePresc(
+    BuildContext context,
+    Widget tile, {
+    Future<bool> Function(BuildContext context) showAlert,
+  }) {
+    return tile;
+  }
+
+  Widget _positionedButton(
+    BuildContext context, {
+    Future<bool> Function(BuildContext context) showAlert,
+  }) {
+    final btn = Positioned(
+      bottom: 20.0,
+      right: 20.0,
+      child: MaterialButton(
+        height: 60.0,
+        onPressed: () => showAlert(context),
+        color: Colors.blue,
+        shape: CircleBorder(),
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
+    );
+    return btn;
   }
 
   void _deletePill(BuildContext context, String pillName) {
@@ -97,6 +132,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
               _deletePill(context, pillName);
             },
             title: pillEntity.pillName,
+            onLongPress: () {},
           ),
         )
         .toList();
