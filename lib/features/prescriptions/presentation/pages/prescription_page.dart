@@ -17,6 +17,8 @@ class PrescriptionPage extends StatefulWidget {
 }
 
 class _PrescriptionPageState extends State<PrescriptionPage> {
+  /// Confirm dialaog to add new presc
+  /// Add a new event to the feature bloc
   Future<void> _confirmDialog(
     BuildContext context,
     String pillName,
@@ -43,12 +45,13 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     }
   }
 
+  /// Build a listview of [FPrescTileWidget] with a separator
   ListView _buildPresc(List<FPrescTileWidget> tiles) {
     return ListView.separated(
       itemBuilder: (BuildContext context, int index) {
         return FPrescFormWidget(
           _confirmDialog,
-          widgetBind: _tilePresc(context, tiles[index]),
+          tiles[index],
         );
       },
       itemCount: tiles.length,
@@ -58,6 +61,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     );
   }
 
+  /// Build the page with the given widget and add on top the positioned
+  /// button
   Container _buildPage(BuildContext context, List<Widget> widgets) {
     return Container(
       child: Stack(
@@ -65,25 +70,18 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
           ...widgets,
           FPrescFormWidget(
             _confirmDialog,
-            widgetBind: _positionedButton,
+            widgetBinder: _positionedButton,
           ),
         ],
       ),
     );
   }
 
-  Widget _tilePresc(
-    BuildContext context,
-    Widget tile, {
-    Future<bool> Function(BuildContext context) showAlert,
-  }) {
-    return tile;
-  }
-
+  /// Render a widget a bottom right to add prescriptions
   Widget _positionedButton(
-    BuildContext context, {
-    Future<bool> Function(BuildContext context) showAlert,
-  }) {
+    BuildContext context,
+    Function(BuildContext) showAlert,
+  ) {
     final btn = Positioned(
       bottom: 20.0,
       right: 20.0,
@@ -101,6 +99,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     return btn;
   }
 
+  /// Function to delete the pill
+  /// Call a feature event
   void _deletePill(BuildContext context, String pillName) {
     final appState = BlocProvider.of<AppBloc>(context).state;
     if (appState is AppLoggedState) {
@@ -113,6 +113,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     }
   }
 
+  /// Page to show when initial prescription event is on
   Widget isInitialPrescriptionsStateEvent(BuildContext context) {
     final appState = BlocProvider.of<AppBloc>(context).state;
     if (appState is AppLoggedState) {
@@ -123,22 +124,36 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     return _buildPage(context, []);
   }
 
+  Widget _renderTile(BuildContext context, Function(BuildContext) showAlert) {
+    return FPrescTileWidget(
+      deleteAction: (String pillName) {
+        _deletePill(context, pillName);
+      },
+      title: pillEntity.pillName,
+      onLongPress: () {},
+    );
+  }
+
+  /// Function to process the list of Entities of prescription through a map
+  /// Always return a [Widget]
+  Widget _processListPills(FPPillEntity pillEntity) {
+    final actionedTile = FPrescFormWidget(
+      _confirmDialog,
+      widgetBinder: tile,
+    );
+  }
+
+  /// Page to show when list pill event is on
   Widget isFprescListPillStateEvent(
-      BuildContext context, FprescListPillState featureState) {
-    final List<FPrescTileWidget> tiles = featureState.allPill
-        .map(
-          (pillEntity) => FPrescTileWidget(
-            deleteAction: (String pillName) {
-              _deletePill(context, pillName);
-            },
-            title: pillEntity.pillName,
-            onLongPress: () {},
-          ),
-        )
-        .toList();
+    BuildContext context,
+    FprescListPillState featureState,
+  ) {
+    final List<Widget> tiles =
+        featureState.allPill.map(_processListPills).toList();
     return _buildPage(context, [_buildPresc(tiles)]);
   }
 
+  /// Bloc event processing of the feature page
   Widget _featureBlocBuilder(BuildContext context, PrescriptionsState state) {
     if (state is InitialPrescriptionsState)
       return isInitialPrescriptionsStateEvent(context);
@@ -148,6 +163,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       return _buildPage(context, []);
   }
 
+  /// Bloc listener of the feature page
   void _featureBlocListener(BuildContext context, PrescriptionsState state) {
     if (state is FPrescAddPillState)
       BlocProvider.of<PrescriptionsBloc>(context)
@@ -157,6 +173,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
           .add(FPrescListPillEvent(uid: state.uid));
   }
 
+  /// Bloc builder + bloc listener
   Widget _blocBuilder(BuildContext context) {
     return BlocListener<PrescriptionsBloc, PrescriptionsState>(
       child: BlocBuilder<PrescriptionsBloc, PrescriptionsState>(
