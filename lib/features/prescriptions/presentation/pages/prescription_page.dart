@@ -19,52 +19,6 @@ class PrescriptionPage extends StatefulWidget {
 }
 
 class _PrescriptionPageState extends State<PrescriptionPage> {
-  /// Confirm dialaog to add new presc
-  /// Add a new event to the feature bloc
-  Future<void> _confirmDialog(
-    BuildContext context,
-    String pillName,
-    int total,
-    int current,
-    int qtyToTake,
-    int remindAt,
-    DateTime remindWhen,
-  ) async {
-    final FPPillEntity entity = FPPillEntity(
-      pillName: pillName,
-      total: total,
-      current: current,
-      qtyToTake: qtyToTake,
-      remindAt: remindAt,
-      remindWhen: remindWhen,
-      taken: false,
-    );
-    final appState = BlocProvider.of<AppBloc>(context).state;
-    if (appState is AppLoggedState) {
-      final uid = appState.user.uid;
-      BlocProvider.of<PrescriptionsBloc>(context)
-          .add(FPrescAddPillEvent(pillEntity: entity, uid: uid));
-    }
-  }
-
-  /// Function that show an alert with the content
-  /// provided as params
-  Future<bool> _showAlert(
-    BuildContext context,
-    String title,
-    Widget formWidget,
-    List<DialogButton> actionDialog,
-  ) {
-    return Alert(
-      style: CSFPresc.alertStyle,
-      title: title,
-      type: AlertType.none,
-      context: context,
-      content: formWidget,
-      buttons: actionDialog,
-    ).show();
-  }
-
   /// Build a listview of [FPrescTileWidget] with a separator
   ListView _buildPresc(List<FPrescTileWidget> tiles) {
     return ListView.separated(
@@ -93,9 +47,6 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
 
   /// Render a widget a bottom right to add prescriptions
   Widget _positionedButton(BuildContext context) {
-    final FPrescFormWidget form = FPrescFormWidget();
-    final List<Widget> actionDialog =
-        form.actionDialog(context, _confirmDialog);
     final String title = "Add prescription";
 
     final btn = Positioned(
@@ -103,12 +54,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       right: 20.0,
       child: MaterialButton(
         height: 60.0,
-        onPressed: () => _showAlert(
-          context,
-          title,
-          form,
-          actionDialog,
-        ),
+        onPressed: () =>
+            FPrescFormWidgetState(title: title).showAlert(context, title),
         color: Colors.blue,
         shape: CircleBorder(),
         child: Icon(
@@ -136,10 +83,14 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
 
   /// Page to show when initial prescription event is on
   Widget isInitialPrescriptionsStateEvent(BuildContext context) {
+    print("Initials presc");
     final appState = BlocProvider.of<AppBloc>(context).state;
     if (appState is AppLoggedState) {
+      print("logged");
       BlocProvider.of<PrescriptionsBloc>(context)
           .add(FPrescListPillEvent(uid: appState.user.uid));
+    } else {
+      print("not logged");
     }
 
     return _buildPage(context, []);
@@ -147,12 +98,8 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
 
   /// Function to process the list of Entities of prescription through a map
   /// Always return a [Widget]
-  FPrescTileWidget _processListPills(FPPillEntity pillEntity) {
-    final FPrescFormWidget form = FPrescFormWidget(
-      pillEntity: pillEntity,
-    );
-    final List<Widget> actionDialog =
-        form.actionDialog(context, _confirmDialog);
+  FPrescTileWidget _processListPills(
+      BuildContext context, FPPillEntity pillEntity) {
     final String title = "Change prescription";
 
     return FPrescTileWidget(
@@ -160,12 +107,10 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
         _deletePill(context, pillName);
       },
       title: pillEntity.pillName,
-      onLongPress: () => _showAlert(
-        context,
-        title,
-        form,
-        actionDialog,
-      ),
+      onLongPress: () => FPrescFormWidgetState(
+        pillEntity: pillEntity,
+        title: title,
+      ).showAlert(context, title),
     );
   }
 
@@ -174,8 +119,11 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     BuildContext context,
     FprescListPillState featureState,
   ) {
-    final List<FPrescTileWidget> tiles =
-        featureState.allPill.map(_processListPills).toList();
+    print("ListPills");
+    final List<FPrescTileWidget> tiles = featureState.allPill
+        .map((tile) => _processListPills(context, tile))
+        .toList();
+    print(tiles.length);
     return _buildPage(context, [_buildPresc(tiles)]);
   }
 
