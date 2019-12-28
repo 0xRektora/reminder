@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/core/static/c_s_styles.dart';
-import 'package:reminder/features/prescriptions/presentation/widgets/f_presc_presc_tile_widget.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../../core/bloc/app_bloc.dart';
 import '../../../../core/bloc/bloc.dart';
@@ -10,6 +7,7 @@ import '../../../../dependency_injector.dart';
 import '../../domain/entities/f_pill_entity.dart';
 import '../bloc/bloc.dart';
 import '../widgets/f_presc_form_widget.dart';
+import '../widgets/f_presc_presc_tile_widget.dart';
 
 class PrescriptionPage extends StatefulWidget {
   PrescriptionPage({Key key}) : super(key: key);
