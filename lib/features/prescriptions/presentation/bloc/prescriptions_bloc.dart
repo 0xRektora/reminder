@@ -37,6 +37,7 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
       );
       yield* listPills.fold(
         (failure) async* {
+          print("Failure gettings list pills : " + failure.message.toString());
           yield InitialPrescriptionsState();
         },
         (allPills) async* {
