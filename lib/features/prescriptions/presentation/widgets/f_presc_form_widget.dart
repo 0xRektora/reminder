@@ -1,40 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
-import 'package:reminder/core/static/c_s_styles.dart';
-import 'package:reminder/core/utils/c_app_converter.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-class FPrescFormWidget extends StatefulWidget {
-  _FPrescFormWidgetState _state = _FPrescFormWidgetState();
+import '../../../../core/bloc/app_bloc.dart';
+import '../../../../core/bloc/app_state.dart';
+import '../../../../core/static/c_s_styles.dart';
+import '../../domain/entities/f_pill_entity.dart';
+import '../bloc/prescriptions_bloc.dart';
+import '../bloc/prescriptions_event.dart';
+
+// class FPrescFormWidget extends StatefulWidget {
+//   final FPPillEntity pillEntity;
+//   final String title;
+
+//   FPrescFormWidget({Key key, @required this.title, this.pillEntity})
+//       : super(key: key);
+
+//   @override
+//   _FPrescFormWidgetState createState() => _FPrescFormWidgetState();
+// }
+
+class FPrescFormWidgetState {
   final FPPillEntity pillEntity;
+  final String title;
 
-  FPrescFormWidget({Key key, this.pillEntity}) : super(key: key);
-
-  List<DialogButton> actionDialog(
-      BuildContext context,
-      Function(
-    BuildContext context,
-    String pillName,
-    int total,
-    int current,
-    int qtyToTake,
-    int remindAt,
-    DateTime remindWhen,
-  )
-          confirmCallBack) {
-    return _state.actionDialog(context, confirmCallBack);
-  }
-
-  @override
-  _FPrescFormWidgetState createState() {
-    _state = _FPrescFormWidgetState();
-    return _state;
-  }
-}
-
-class _FPrescFormWidgetState extends State<FPrescFormWidget> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   FormBuilderTextField pillName;
@@ -48,6 +39,41 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
   FormBuilderTextField remindAt;
 
   FormBuilderDateTimePicker remindWhen;
+
+  FPrescFormWidgetState({
+    @required this.title,
+    this.pillEntity,
+  }) {
+    _initFormBuilder();
+  }
+
+  /// Confirm dialaog to add new presc
+  /// Add a new event to the feature bloc
+  Future<void> _confirmDialog(
+    BuildContext context,
+    String pillName,
+    int total,
+    int current,
+    int qtyToTake,
+    int remindAt,
+    DateTime remindWhen,
+  ) async {
+    final FPPillEntity entity = FPPillEntity(
+      pillName: pillName,
+      total: total,
+      current: current,
+      qtyToTake: qtyToTake,
+      remindAt: remindAt,
+      remindWhen: remindWhen,
+      taken: false,
+    );
+    final appState = BlocProvider.of<AppBloc>(context).state;
+    if (appState is AppLoggedState) {
+      final uid = appState.user.uid;
+      BlocProvider.of<PrescriptionsBloc>(context)
+          .add(FPrescAddPillEvent(pillEntity: entity, uid: uid));
+    }
+  }
 
   Widget _buildPillNameForm() {
     return pillName;
@@ -92,8 +118,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     ;
   }
 
-  Future<bool> _confirmForm(context, Function callBack) async {
-    print("KEY: " + _fbKey.currentState.toString());
+  Future<bool> _confirmForm(BuildContext context) async {
     if (_fbKey.currentState.saveAndValidate()) {
       final pillNameValue =
           _fbKey.currentState.fields["pillName"].currentState.value;
@@ -107,7 +132,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
           int.parse(_fbKey.currentState.fields["remindAt"].currentState.value);
       final remindWhenValue =
           _fbKey.currentState.fields["remindWhen"].currentState.value;
-      await callBack(context, pillNameValue, totalValue, currentValue,
+      await _confirmDialog(context, pillNameValue, totalValue, currentValue,
           qtyToTakeValue, remindAtValue, remindWhenValue);
       return true;
     } else {
@@ -132,11 +157,11 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
   }
 
-  List<DialogButton> actionDialog(BuildContext context, confirmCallBack) {
+  List<DialogButton> _actionDialog(BuildContext context) {
     return [
       DialogButton(
         onPressed: () {
-          _confirmForm(context, confirmCallBack).then((success) {
+          _confirmForm(context).then((success) {
             if (success) {
               Navigator.of(context).pop();
             }
@@ -163,7 +188,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
 
   void _initFormBuilder() {
     final String pillNameInitValue =
-        widget.pillEntity == null ? "" : widget.pillEntity.pillName ?? "";
+        this.pillEntity == null ? "" : this.pillEntity.pillName ?? "";
     pillName = FormBuilderTextField(
       attribute: "pillName",
       initialValue: pillNameInitValue,
@@ -178,7 +203,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
 
     final String totalInitValue =
-        widget.pillEntity == null ? "" : "${widget.pillEntity.total}" ?? "";
+        this.pillEntity == null ? "" : "${this.pillEntity.total}" ?? "";
     total = FormBuilderTextField(
       attribute: "total",
       initialValue: totalInitValue,
@@ -196,7 +221,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
 
     final String currentInitValue =
-        widget.pillEntity == null ? "" : "${widget.pillEntity.current}" ?? "";
+        this.pillEntity == null ? "" : "${this.pillEntity.current}" ?? "";
     current = FormBuilderTextField(
       attribute: "current",
       initialValue: currentInitValue,
@@ -214,7 +239,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
 
     final String qtyToTakeInitValue =
-        widget.pillEntity == null ? "" : "${widget.pillEntity.qtyToTake}" ?? "";
+        this.pillEntity == null ? "" : "${this.pillEntity.qtyToTake}" ?? "";
     qtyToTake = FormBuilderTextField(
       attribute: "qtyToTake",
       initialValue: qtyToTakeInitValue,
@@ -232,7 +257,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
 
     final String remindAtInitValue =
-        widget.pillEntity == null ? "" : "${widget.pillEntity.remindAt}" ?? "";
+        this.pillEntity == null ? "" : "${this.pillEntity.remindAt}" ?? "";
     remindAt = FormBuilderTextField(
       attribute: "remindAt",
       initialValue: remindAtInitValue,
@@ -249,9 +274,9 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
       ],
     );
 
-    final DateTime remindWhenInitValue = widget.pillEntity == null
+    final DateTime remindWhenInitValue = this.pillEntity == null
         ? DateTime.now()
-        : widget.pillEntity.remindWhen ?? DateTime.now();
+        : this.pillEntity.remindWhen ?? DateTime.now();
     remindWhen = FormBuilderDateTimePicker(
       attribute: "remindWhen",
       keyboardType: TextInputType.datetime,
@@ -268,15 +293,19 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    _initFormBuilder();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _formWidget(context);
+  /// Function that show an alert with the content
+  /// provided as params
+  Future<bool> showAlert(
+    BuildContext context,
+    String title,
+  ) {
+    return Alert(
+      style: CSFPresc.alertStyle,
+      title: title,
+      type: AlertType.none,
+      context: context,
+      content: _formWidget(context),
+      buttons: _actionDialog(context),
+    ).show();
   }
 }
