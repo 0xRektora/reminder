@@ -49,9 +49,9 @@ class CDDbRepoImpl implements CDDbRepo {
           .toList();
 
       return Right(allPillEntity);
-    } on ServerException {
+    } on ServerException catch (e) {
       return Left(
-        ServerFailure(),
+        ServerFailure(message: e.message),
       );
     }
   }

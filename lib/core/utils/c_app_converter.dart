@@ -1,6 +1,6 @@
 class CAppConverter {
   static String fromDatetimeToString(DateTime dateTime) {
-    return "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
+    return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
   }
 
   static DateTime fromStringToDatetime(String dateTime) {
