@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:reminder/core/static/c_s_styles.dart';
 import 'package:reminder/features/prescriptions/presentation/widgets/f_presc_presc_tile_widget.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import '../../../../core/bloc/app_bloc.dart';
 import '../../../../core/bloc/bloc.dart';
@@ -45,14 +47,29 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     }
   }
 
+  /// Function that show an alert with the content
+  /// provided as params
+  Future<bool> _showAlert(
+    BuildContext context,
+    String title,
+    Widget formWidget,
+    List<DialogButton> actionDialog,
+  ) {
+    return Alert(
+      style: CSFPresc.alertStyle,
+      title: title,
+      type: AlertType.none,
+      context: context,
+      content: formWidget,
+      buttons: actionDialog,
+    ).show();
+  }
+
   /// Build a listview of [FPrescTileWidget] with a separator
   ListView _buildPresc(List<FPrescTileWidget> tiles) {
     return ListView.separated(
       itemBuilder: (BuildContext context, int index) {
-        return FPrescFormWidget(
-          _confirmDialog,
-          tiles[index],
-        );
+        return tiles[index];
       },
       itemCount: tiles.length,
       separatorBuilder: (BuildContext context, int index) => const Divider(
@@ -68,26 +85,30 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       child: Stack(
         children: <Widget>[
           ...widgets,
-          FPrescFormWidget(
-            _confirmDialog,
-            widgetBinder: _positionedButton,
-          ),
+          _positionedButton(context),
         ],
       ),
     );
   }
 
   /// Render a widget a bottom right to add prescriptions
-  Widget _positionedButton(
-    BuildContext context,
-    Function(BuildContext) showAlert,
-  ) {
+  Widget _positionedButton(BuildContext context) {
+    final FPrescFormWidget form = FPrescFormWidget();
+    final List<Widget> actionDialog =
+        form.actionDialog(context, _confirmDialog);
+    final String title = "Add prescription";
+
     final btn = Positioned(
       bottom: 20.0,
       right: 20.0,
       child: MaterialButton(
         height: 60.0,
-        onPressed: () => showAlert(context),
+        onPressed: () => _showAlert(
+          context,
+          title,
+          form,
+          actionDialog,
+        ),
         color: Colors.blue,
         shape: CircleBorder(),
         child: Icon(
@@ -124,22 +145,27 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     return _buildPage(context, []);
   }
 
-  Widget _renderTile(BuildContext context, Function(BuildContext) showAlert) {
+  /// Function to process the list of Entities of prescription through a map
+  /// Always return a [Widget]
+  FPrescTileWidget _processListPills(FPPillEntity pillEntity) {
+    final FPrescFormWidget form = FPrescFormWidget(
+      pillEntity: pillEntity,
+    );
+    final List<Widget> actionDialog =
+        form.actionDialog(context, _confirmDialog);
+    final String title = "Change prescription";
+
     return FPrescTileWidget(
       deleteAction: (String pillName) {
         _deletePill(context, pillName);
       },
       title: pillEntity.pillName,
-      onLongPress: () {},
-    );
-  }
-
-  /// Function to process the list of Entities of prescription through a map
-  /// Always return a [Widget]
-  Widget _processListPills(FPPillEntity pillEntity) {
-    final actionedTile = FPrescFormWidget(
-      _confirmDialog,
-      widgetBinder: tile,
+      onLongPress: () => _showAlert(
+        context,
+        title,
+        form,
+        actionDialog,
+      ),
     );
   }
 
@@ -148,7 +174,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     BuildContext context,
     FprescListPillState featureState,
   ) {
-    final List<Widget> tiles =
+    final List<FPrescTileWidget> tiles =
         featureState.allPill.map(_processListPills).toList();
     return _buildPage(context, [_buildPresc(tiles)]);
   }
