@@ -1,114 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import '../../../../core/static/c_s_styles.dart';
+import 'package:intl/intl.dart';
+import 'package:reminder/core/static/c_s_styles.dart';
+import 'package:reminder/core/utils/c_app_converter.dart';
+import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class FPrescFormWidget extends StatefulWidget {
-  final Function(BuildContext context, String pillName, int total, int current,
-      int qtyToTake, int remindAt, DateTime remindWhen) confirmCallBack;
-  FPrescFormWidget(this.confirmCallBack, {Key key}) : super(key: key);
+  _FPrescFormWidgetState _state = _FPrescFormWidgetState();
+  final FPPillEntity pillEntity;
+
+  FPrescFormWidget({Key key, this.pillEntity}) : super(key: key);
+
+  List<DialogButton> actionDialog(
+      BuildContext context,
+      Function(
+    BuildContext context,
+    String pillName,
+    int total,
+    int current,
+    int qtyToTake,
+    int remindAt,
+    DateTime remindWhen,
+  )
+          confirmCallBack) {
+    return _state.actionDialog(context, confirmCallBack);
+  }
 
   @override
-  _FPrescFormWidgetState createState() => _FPrescFormWidgetState();
+  _FPrescFormWidgetState createState() {
+    _state = _FPrescFormWidgetState();
+    return _state;
+  }
 }
 
 class _FPrescFormWidgetState extends State<FPrescFormWidget> {
-  var _alertStyle = AlertStyle(
-    animationType: AnimationType.fromTop,
-    isCloseButton: false,
-    isOverlayTapDismiss: false,
-    descStyle: TextStyle(fontWeight: FontWeight.w200, fontSize: 6),
-    animationDuration: Duration(milliseconds: 400),
-    alertBorder: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-    titleStyle: TextStyle(
-      color: CSAppColors.PRIMARY_COLOR,
-    ),
-  );
-
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
-  FormBuilderTextField pillName = FormBuilderTextField(
-    attribute: "pillName",
-    maxLength: 25,
-    decoration: InputDecoration(
-      labelText: "Prescription name",
-      fillColor: Colors.white,
-    ),
-    validators: [
-      FormBuilderValidators.required(),
-    ],
-  );
-  FormBuilderTextField total = FormBuilderTextField(
-    attribute: "total",
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      labelText: "Total of prescription",
-      fillColor: Colors.white,
-    ),
-    validators: [
-      FormBuilderValidators.required(),
-      FormBuilderValidators.numeric(
-        errorText: "Must be a numeric value",
-      ),
-    ],
-  );
-  FormBuilderTextField current = FormBuilderTextField(
-    attribute: "current",
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      labelText: "Actually have",
-      fillColor: Colors.white,
-    ),
-    validators: [
-      FormBuilderValidators.required(),
-      FormBuilderValidators.numeric(
-        errorText: "Must be a numeric value",
-      ),
-    ],
-  );
+  FormBuilderTextField pillName;
 
-  FormBuilderTextField qtyToTake = FormBuilderTextField(
-    attribute: "qtyToTake",
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      labelText: "Qty to take",
-      fillColor: Colors.white,
-    ),
-    validators: [
-      FormBuilderValidators.required(),
-      FormBuilderValidators.numeric(
-        errorText: "Must be a numeric value",
-      ),
-    ],
-  );
-  FormBuilderTextField remindAt = FormBuilderTextField(
-    attribute: "remindAt",
-    keyboardType: TextInputType.number,
-    decoration: InputDecoration(
-      labelText: "Remind me at X number",
-      fillColor: Colors.white,
-    ),
-    validators: [
-      FormBuilderValidators.required(),
-      FormBuilderValidators.numeric(
-        errorText: "Must be a numeric value",
-      ),
-    ],
-  );
-  FormBuilderDateTimePicker remindWhen = FormBuilderDateTimePicker(
-    attribute: "remindWhen",
-    keyboardType: TextInputType.datetime,
-    decoration: InputDecoration(
-      labelText: "Remind me when time is",
-      fillColor: Colors.white,
-    ),
-    inputType: InputType.time,
-    validators: [
-      FormBuilderValidators.required(),
-    ],
-  );
+  FormBuilderTextField total;
+
+  FormBuilderTextField current;
+
+  FormBuilderTextField qtyToTake;
+
+  FormBuilderTextField remindAt;
+
+  FormBuilderDateTimePicker remindWhen;
 
   Widget _buildPillNameForm() {
     return pillName;
@@ -154,6 +93,7 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
   }
 
   Future<bool> _confirmForm(context, Function callBack) async {
+    print("KEY: " + _fbKey.currentState.toString());
     if (_fbKey.currentState.saveAndValidate()) {
       final pillNameValue =
           _fbKey.currentState.fields["pillName"].currentState.value;
@@ -192,11 +132,11 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     );
   }
 
-  List<DialogButton> _actionDialog(BuildContext context) {
+  List<DialogButton> actionDialog(BuildContext context, confirmCallBack) {
     return [
       DialogButton(
         onPressed: () {
-          _confirmForm(context, widget.confirmCallBack).then((success) {
+          _confirmForm(context, confirmCallBack).then((success) {
             if (success) {
               Navigator.of(context).pop();
             }
@@ -221,32 +161,122 @@ class _FPrescFormWidgetState extends State<FPrescFormWidget> {
     ];
   }
 
-  Future<bool> _showAlert(BuildContext context) {
-    return Alert(
-      style: _alertStyle,
-      title: "New prescription",
-      type: AlertType.none,
-      context: context,
-      content: _formWidget(context),
-      buttons: _actionDialog(context),
-    ).show();
+  void _initFormBuilder() {
+    final String pillNameInitValue =
+        widget.pillEntity == null ? "" : widget.pillEntity.pillName ?? "";
+    pillName = FormBuilderTextField(
+      attribute: "pillName",
+      initialValue: pillNameInitValue,
+      maxLength: 25,
+      decoration: InputDecoration(
+        labelText: "Prescription name",
+        fillColor: Colors.white,
+      ),
+      validators: [
+        FormBuilderValidators.required(),
+      ],
+    );
+
+    final String totalInitValue =
+        widget.pillEntity == null ? "" : "${widget.pillEntity.total}" ?? "";
+    total = FormBuilderTextField(
+      attribute: "total",
+      initialValue: totalInitValue,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: "Total of prescription",
+        fillColor: Colors.white,
+      ),
+      validators: [
+        FormBuilderValidators.required(),
+        FormBuilderValidators.numeric(
+          errorText: "Must be a numeric value",
+        ),
+      ],
+    );
+
+    final String currentInitValue =
+        widget.pillEntity == null ? "" : "${widget.pillEntity.current}" ?? "";
+    current = FormBuilderTextField(
+      attribute: "current",
+      initialValue: currentInitValue,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: "Actually have",
+        fillColor: Colors.white,
+      ),
+      validators: [
+        FormBuilderValidators.required(),
+        FormBuilderValidators.numeric(
+          errorText: "Must be a numeric value",
+        ),
+      ],
+    );
+
+    final String qtyToTakeInitValue =
+        widget.pillEntity == null ? "" : "${widget.pillEntity.qtyToTake}" ?? "";
+    qtyToTake = FormBuilderTextField(
+      attribute: "qtyToTake",
+      initialValue: qtyToTakeInitValue,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: "Qty to take",
+        fillColor: Colors.white,
+      ),
+      validators: [
+        FormBuilderValidators.required(),
+        FormBuilderValidators.numeric(
+          errorText: "Must be a numeric value",
+        ),
+      ],
+    );
+
+    final String remindAtInitValue =
+        widget.pillEntity == null ? "" : "${widget.pillEntity.remindAt}" ?? "";
+    remindAt = FormBuilderTextField(
+      attribute: "remindAt",
+      initialValue: remindAtInitValue,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: "Remind me at X number",
+        fillColor: Colors.white,
+      ),
+      validators: [
+        FormBuilderValidators.required(),
+        FormBuilderValidators.numeric(
+          errorText: "Must be a numeric value",
+        ),
+      ],
+    );
+
+    final DateTime remindWhenInitValue = widget.pillEntity == null
+        ? DateTime.now()
+        : widget.pillEntity.remindWhen ?? DateTime.now();
+    remindWhen = FormBuilderDateTimePicker(
+      attribute: "remindWhen",
+      keyboardType: TextInputType.datetime,
+      initialValue: remindWhenInitValue,
+      format: DateFormat("hh:mm a"),
+      decoration: InputDecoration(
+        labelText: "Remind me when time is",
+        fillColor: Colors.white,
+      ),
+      inputType: InputType.time,
+      validators: [
+        FormBuilderValidators.required(),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _initFormBuilder();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 20.0,
-      right: 20.0,
-      child: MaterialButton(
-        height: 60.0,
-        onPressed: () => _showAlert(context),
-        color: Colors.blue,
-        shape: CircleBorder(),
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
-    );
+    return _formWidget(context);
   }
 }
