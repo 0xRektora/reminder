@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class CSBottomNavBarStyle {
   static final Color iconColor = Colors.black;
@@ -17,5 +18,21 @@ class CSAppTheme {
     brightness: Brightness.light,
     primaryColor: CSAppColors.PRIMARY_COLOR,
     accentColor: CSAppColors.ACCENT_COLOR,
+  );
+}
+
+class CSFPresc {
+  static final alertStyle = AlertStyle(
+    animationType: AnimationType.fromTop,
+    isCloseButton: false,
+    isOverlayTapDismiss: false,
+    descStyle: TextStyle(fontWeight: FontWeight.w200, fontSize: 6),
+    animationDuration: Duration(milliseconds: 400),
+    alertBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    titleStyle: TextStyle(
+      color: CSAppColors.PRIMARY_COLOR,
+    ),
   );
 }
