@@ -1,6 +1,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 import 'package:reminder/core/usecases/c_app_delete_pill_usecase.dart';
+import 'package:reminder/features/calendar/presentation/bloc/bloc.dart';
 
 import 'core/bloc/app_bloc.dart';
 import 'core/data/datasources/c_d_pill_datasource.dart';
@@ -34,6 +35,9 @@ Future<void> init() async {
 
   // Feature Prescriptions
   fPresc();
+
+  // Feature calendar
+  fCalendar();
 }
 
 Future<void> cApp() async {
@@ -121,4 +125,11 @@ Future<void> fLogin() async {
 
   //Datasources
   sl.registerLazySingleton<LoginDataSource>(() => LoginDataSourceImpl());
+}
+
+Future<void> fCalendar() async {
+  // TODO makes concordant changes
+
+  // Bloc
+  sl.registerFactory(() => CalendarBloc(sl()));
 }

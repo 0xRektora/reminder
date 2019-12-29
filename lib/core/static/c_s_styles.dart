@@ -36,3 +36,9 @@ class CSFPresc {
     ),
   );
 }
+
+class CSFCalendar {
+  static const Color pillTaken = Colors.green;
+  static const Color pillNotTaken = Colors.red;
+  static const Color inactiveDay = Colors.grey;
+}
