@@ -1,4 +1,5 @@
 # Miscellaneous
+*.properties
 *.lock
 *.class
 *.log
