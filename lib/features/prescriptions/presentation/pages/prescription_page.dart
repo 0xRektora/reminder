@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:reminder/core/utils/utils.dart';
 
 import '../../../../core/bloc/app_bloc.dart';
 import '../../../../core/bloc/bloc.dart';
@@ -153,6 +155,28 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       ),
       listener: _featureBlocListener,
     );
+  }
+
+  /// Called once from init state to check if the app was launched from notification
+  /// And if so validate that the pill was taken
+  void _lanchedFromNotif(BuildContext context) async {
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        sl<FlutterLocalNotificationsPlugin>();
+    final notificationAppLaunchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+    if (notificationAppLaunchDetails.didNotificationLaunchApp) {
+      final Map<String, dynamic> data =
+          UnpackPayload.call(notificationAppLaunchDetails.payload);
+      final String name = data["name"];
+      BlocProvider.of(context).add(FPrescValidatePillEvent(pillName: name));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _lanchedFromNotif(context);
   }
 
   @override

@@ -6,31 +6,27 @@ import 'package:reminder/core/error/failures.dart';
 import 'package:reminder/core/usecases/usecase.dart';
 import 'package:reminder/features/reminder_schedule/domain/repositories/f_reminder_schedule_repo.dart';
 
-class FReminderScheduleSetUsecase
-    implements Usecase<bool, FReminderScheduleSetUsecaseParam> {
+class FReminderScheduleUnsetUsecase
+    implements Usecase<bool, FReminderScheduleUnsetParam> {
   final FReminderScheduleRepo reminderScheduleRepo;
 
-  FReminderScheduleSetUsecase({@required this.reminderScheduleRepo});
+  FReminderScheduleUnsetUsecase({@required this.reminderScheduleRepo});
 
   @override
-  Future<Either<Failure, bool>> call(
-      FReminderScheduleSetUsecaseParam params) async {
-    return await reminderScheduleRepo.setSchedule(
-      flutterLocalNotificationsPlugin: params.flutterLocalNotificationsPlugin,
-      notificationName: params.notificationName,
-      notificationId: params.notificationId,
-      time: params.time,
-    );
+  Future<Either<Failure, bool>> call(FReminderScheduleUnsetParam params) async {
+    return await reminderScheduleRepo.unsetSchedule(
+        notificationName: params.notificationName,
+        flutterLocalNotificationsPlugin: params.flutterLocalNotificationsPlugin,
+        notificationId: params.notificationId);
   }
 }
 
-class FReminderScheduleSetUsecaseParam extends Equatable {
-  final Time time;
+class FReminderScheduleUnsetParam extends Equatable {
   final String notificationName;
   final int notificationId;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  FReminderScheduleSetUsecaseParam({
-    @required this.time,
+
+  FReminderScheduleUnsetParam({
     @required this.notificationName,
     @required this.notificationId,
     @required this.flutterLocalNotificationsPlugin,
@@ -38,9 +34,8 @@ class FReminderScheduleSetUsecaseParam extends Equatable {
 
   @override
   List<Object> get props => [
-        time,
         notificationName,
-        notificationName,
+        notificationId,
         flutterLocalNotificationsPlugin,
       ];
 }
