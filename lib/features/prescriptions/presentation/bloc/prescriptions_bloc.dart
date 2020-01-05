@@ -113,9 +113,10 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
     }
 
     if (event is FPrescChangePillEvent) {
-      //TODO Add change pill event login
+      //TODO Remove - unused
     }
 
+    // TODO Copy to reminder presc bloc
     if (event is FPrescValidatePillEvent) {
       _reminderUnsetSchedule(event.pillName);
     }
