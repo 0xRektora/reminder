@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
+import 'package:reminder/core/utils/c_app_shared_pref_manager.dart';
 import 'package:reminder/features/reminder_schedule/domain/usecases/f_reminder_schedule_unset_usecase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/bloc/app_bloc.dart';
 import 'core/data/datasources/c_d_pill_datasource.dart';
@@ -20,7 +22,6 @@ import 'features/login/presentation/bloc/bloc.dart';
 import 'features/prescriptions/presentation/bloc/bloc.dart';
 import 'features/reminder_schedule/data/repositories/f_reminder_schedule_repo_impl.dart';
 import 'features/reminder_schedule/domain/repositories/f_reminder_schedule_repo.dart';
-import 'features/reminder_schedule/domain/usecases/f_reminder_schedule_get_id_usecase.dart';
 import 'features/reminder_schedule/domain/usecases/f_reminder_schedule_set_usecase.dart';
 
 final sl = GetIt.instance;
@@ -81,6 +82,11 @@ Future<void> cApp() async {
   sl.registerLazySingleton<FlutterLocalNotificationsPlugin>(
     () => FlutterLocalNotificationsPlugin(),
   );
+
+  // Shared Pref Manager
+  sl.registerLazySingleton<CAppSharedPrefManager>(
+    () => CAppSharedPrefManagerImpl(),
+  );
 }
 
 Future<void> fReminderSchedule() async {
@@ -97,15 +103,11 @@ Future<void> fReminderSchedule() async {
     ),
   );
 
-  sl.registerLazySingleton(
-    () => FReminderScheduleGetIdUsecase(
-      reminderScheduleRepo: sl(),
-    ),
-  );
-
   // Repositories
   sl.registerLazySingleton<FReminderScheduleRepo>(
-    () => FReminderScheduleRepoImpl(),
+    () => FReminderScheduleRepoImpl(
+      cAppSharedPrefManager: sl(),
+    ),
   );
 }
 
@@ -118,7 +120,6 @@ Future<void> fPresc() async {
       cAppGetPillUsecase: sl(),
       cAppDeletePillUsecase: sl(),
       flutterLocalNotificationsPlugin: sl(),
-      fReminderScheduleGetIdUsecase: sl(),
       fReminderScheduleSetUsecase: sl(),
       fReminderScheduleUnsetUsecase: sl(),
     ),
