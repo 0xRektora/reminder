@@ -62,7 +62,7 @@ class PrescNotification {
   factory PrescNotification.fromJson(
       Map<String, dynamic> prescNotificationJson) {
     DateTime dateTime =
-        CAppConverter.fromStringToDatetime(prescNotificationJson['timeToTake']);
+        CAppConverter.fromStringToTime(prescNotificationJson['timeToTake']);
     Time time = Time(
       dateTime.hour,
       dateTime.minute,
@@ -78,7 +78,7 @@ class PrescNotification {
     DateTime dateTime = DateTime.parse(
       "1970-01-01 ${this.timeToTake.hour.toString().padLeft(2, '0')}:${this.timeToTake.minute.toString().padLeft(2, '0')}:00.00",
     );
-    String timeToTake = CAppConverter.fromDatetimeToString(dateTime);
+    String timeToTake = CAppConverter.fromTimeToString(dateTime);
     return {
       'notificationId': this.notificationId,
       'notificationName': this.notificationName,

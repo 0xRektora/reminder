@@ -28,8 +28,7 @@ class CDAppPillModel {
       CSDbPillDoc.CURRENT: this.current,
       CSDbPillDoc.QTY_TO_TAKE: this.qtyToTake,
       CSDbPillDoc.REMIND_AT: this.remindAt,
-      CSDbPillDoc.REMIND_WHEN:
-          CAppConverter.fromDatetimeToString(this.remindWhen),
+      CSDbPillDoc.REMIND_WHEN: CAppConverter.fromTimeToString(this.remindWhen),
       CSDbPillDoc.TAKEN: this.taken,
     };
   }
@@ -42,8 +41,7 @@ class CDAppPillModel {
       current: ds[CSDbPillDoc.CURRENT],
       qtyToTake: ds[CSDbPillDoc.QTY_TO_TAKE],
       remindAt: ds[CSDbPillDoc.REMIND_AT],
-      remindWhen:
-          CAppConverter.fromStringToDatetime(ds[CSDbPillDoc.REMIND_WHEN]),
+      remindWhen: CAppConverter.fromStringToTime(ds[CSDbPillDoc.REMIND_WHEN]),
       taken: ds[CSDbPillDoc.TAKEN],
     );
   }
