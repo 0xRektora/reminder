@@ -122,6 +122,7 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
       priority: Priority.High,
       importance: Importance.High,
       autoCancel: false,
+      ongoing: true,
     );
     final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
     final platformChannelSpecifics = new NotificationDetails(
