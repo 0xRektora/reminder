@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:reminder/core/utils/utils.dart';
+import 'package:reminder/features/reminder_presc/presentation/widgets/reminder_presc_page.dart';
 import 'package:reminder/features/reminder_schedule/domain/usecases/f_reminder_schedule_unset_usecase.dart';
 
 import '../dependency_injector.dart';
@@ -75,6 +76,7 @@ class _AppState extends State<App> {
   final List<Widget> pageViews = <Widget>[
     PrescriptionPage(),
     CalendarPage(),
+    ReminderPrescPage(),
     SettingsPage(),
   ];
 
@@ -98,6 +100,17 @@ class _AppState extends State<App> {
         ),
         title: Text(
           "Calendar",
+          style: CSBottomNavBarStyle.textStyle,
+        ),
+        activeColor: CSBottomNavBarStyle.activeColor),
+    // Reminder Presc
+    BottomNavyBarItem(
+        icon: Icon(
+          Icons.alarm,
+          color: CSBottomNavBarStyle.iconColor,
+        ),
+        title: Text(
+          "Reminder",
           style: CSBottomNavBarStyle.textStyle,
         ),
         activeColor: CSBottomNavBarStyle.activeColor),
@@ -148,9 +161,27 @@ class _AppState extends State<App> {
     );
   }
 
+  /// Called once from init state to check if the app was launched from notification
+  /// And if so validate that the pill was taken
+  void _lanchedFromNotif(BuildContext context) async {
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        sl<FlutterLocalNotificationsPlugin>();
+    final notificationAppLaunchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+    if (notificationAppLaunchDetails.didNotificationLaunchApp) {
+      _pageController.animateToPage(
+        3,
+        duration: Duration(seconds: 1),
+        curve: Curves.linear,
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _lanchedFromNotif(context);
   }
 
   @override
