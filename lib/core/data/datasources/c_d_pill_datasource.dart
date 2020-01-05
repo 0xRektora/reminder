@@ -6,12 +6,26 @@ import '../../static/c_s_db_routes.dart';
 import '../models/c_d_app_pill_model.dart';
 
 abstract class CDPillDatasource {
-  Future<bool> deletePill({@required String uid, @required String pillName});
-  Future<CDAppPillModel> getPill(
-      {@required String uid, @required String pillName});
-  Future<List<CDAppPillModel>> allPill({@required String uid});
-  Future<bool> addPill(
-      {@required CDAppPillModel appPillModel, @required String uid});
+  Future<bool> deletePill({
+    @required String uid,
+    @required String pillName,
+  });
+  Future<CDAppPillModel> getPill({
+    @required String uid,
+    @required String pillName,
+  });
+  Future<List<CDAppPillModel>> allPill({
+    @required String uid,
+  });
+  Future<bool> addPill({
+    @required CDAppPillModel appPillModel,
+    @required String uid,
+  });
+  Future<bool> validatePill({
+    @required String uid,
+    @required CDAppPillModel appPillModel,
+    @required String date,
+  });
 }
 
 class CDPillDatasourceImpl implements CDPillDatasource {
@@ -75,6 +89,25 @@ class CDPillDatasourceImpl implements CDPillDatasource {
           .delete();
       return true;
     } on Exception catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<bool> validatePill({
+    String uid,
+    CDAppPillModel appPillModel,
+    String date,
+  }) async {
+    try {
+      await Firestore.instance
+          .collection(CSDbRoutes.PRESCRIPTIONS)
+          .document(uid)
+          .collection(date)
+          .document(appPillModel.pillName)
+          .setData(appPillModel.toDoc());
+      return true;
+    } on ServerException catch (e) {
       throw ServerException(message: e.toString());
     }
   }
