@@ -18,7 +18,6 @@ class FReminderScheduleSetUsecase
     return await reminderScheduleRepo.setSchedule(
       flutterLocalNotificationsPlugin: params.flutterLocalNotificationsPlugin,
       notificationName: params.notificationName,
-      notificationId: params.notificationId,
       time: params.time,
     );
   }
@@ -27,19 +26,16 @@ class FReminderScheduleSetUsecase
 class FReminderScheduleSetUsecaseParam extends Equatable {
   final Time time;
   final String notificationName;
-  final int notificationId;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   FReminderScheduleSetUsecaseParam({
     @required this.time,
     @required this.notificationName,
-    @required this.notificationId,
     @required this.flutterLocalNotificationsPlugin,
   });
 
   @override
   List<Object> get props => [
         time,
-        notificationName,
         notificationName,
         flutterLocalNotificationsPlugin,
       ];

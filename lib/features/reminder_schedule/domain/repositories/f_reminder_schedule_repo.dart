@@ -6,7 +6,6 @@ import '../../../../core/error/failures.dart';
 
 abstract class FReminderScheduleRepo {
   Future<Either<Failure, bool>> unsetSchedule({
-    @required int notificationId,
     @required String notificationName,
     @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   });
@@ -14,9 +13,6 @@ abstract class FReminderScheduleRepo {
   Future<Either<Failure, bool>> setSchedule({
     @required Time time,
     @required String notificationName,
-    @required int notificationId,
     @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   });
-
-  Future<Either<Failure, int>> getId({@required String name});
 }

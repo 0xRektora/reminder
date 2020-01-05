@@ -10,7 +10,6 @@ import '../../../../core/usecases/c_app_add_pill_usecase.dart';
 import '../../../../core/usecases/c_app_all_pill_usecase.dart';
 import '../../../../core/usecases/c_app_delete_pill_usecase.dart';
 import '../../../../core/usecases/c_app_get_pill_usecase.dart';
-import '../../../reminder_schedule/domain/usecases/f_reminder_schedule_get_id_usecase.dart';
 import '../../../reminder_schedule/domain/usecases/f_reminder_schedule_set_usecase.dart';
 import '../../domain/entities/f_pill_entity.dart';
 
@@ -20,7 +19,6 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
   final CAppGetPillUsecase cAppGetPillUsecase;
   final CAppDeletePillUsecase cAppDeletePillUsecase;
   final FReminderScheduleSetUsecase fReminderScheduleSetUsecase;
-  final FReminderScheduleGetIdUsecase fReminderScheduleGetIdUsecase;
   final FReminderScheduleUnsetUsecase fReminderScheduleUnsetUsecase;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
@@ -30,7 +28,6 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
     @required this.cAppGetPillUsecase,
     @required this.cAppDeletePillUsecase,
     @required this.fReminderScheduleSetUsecase,
-    @required this.fReminderScheduleGetIdUsecase,
     @required this.flutterLocalNotificationsPlugin,
     @required this.fReminderScheduleUnsetUsecase,
   });
@@ -39,21 +36,8 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
   PrescriptionsState get initialState => InitialPrescriptionsState();
 
   void _reminderUnsetSchedule(String pillName) async {
-    final usecaseGetId = await fReminderScheduleGetIdUsecase(
-        FReminderScheduleGetIdParam(name: pillName));
-    int notificationId;
-    usecaseGetId.fold(
-      (failure) {
-        print(failure.message);
-      },
-      (success) {
-        notificationId = success;
-      },
-    );
-
     await fReminderScheduleUnsetUsecase(FReminderScheduleUnsetParam(
       notificationName: pillName,
-      notificationId: notificationId,
       flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
     ));
   }
@@ -61,27 +45,25 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
   void _reminderSetSchedule(FPPillEntity fpPillEntity) async {
     print("setting notification");
     final notificationName = fpPillEntity.pillName;
-    final usecaseGetId = await fReminderScheduleGetIdUsecase(
-        FReminderScheduleGetIdParam(name: fpPillEntity.pillName));
-    int notificationId;
-    usecaseGetId.fold(
-      (failure) {
-        print(failure.message);
-      },
-      (success) {
-        notificationId = success;
-      },
-    );
 
     final time =
         Time(fpPillEntity.remindWhen.hour, fpPillEntity.remindWhen.minute);
 
-    await fReminderScheduleSetUsecase(FReminderScheduleSetUsecaseParam(
-      time: time,
-      notificationId: notificationId,
-      notificationName: notificationName,
-      flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
-    ));
+    final usecase = await fReminderScheduleSetUsecase(
+      FReminderScheduleSetUsecaseParam(
+        time: time,
+        notificationName: notificationName,
+        flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+      ),
+    );
+    usecase.fold(
+      (failure) {
+        print(failure.message);
+      },
+      (success) {
+        print('fReminderScheduleSetUsecase usecase');
+      },
+    );
     print("notification set");
   }
 

@@ -15,27 +15,24 @@ class FReminderScheduleUnsetUsecase
   @override
   Future<Either<Failure, bool>> call(FReminderScheduleUnsetParam params) async {
     return await reminderScheduleRepo.unsetSchedule(
-        notificationName: params.notificationName,
-        flutterLocalNotificationsPlugin: params.flutterLocalNotificationsPlugin,
-        notificationId: params.notificationId);
+      notificationName: params.notificationName,
+      flutterLocalNotificationsPlugin: params.flutterLocalNotificationsPlugin,
+    );
   }
 }
 
 class FReminderScheduleUnsetParam extends Equatable {
   final String notificationName;
-  final int notificationId;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   FReminderScheduleUnsetParam({
     @required this.notificationName,
-    @required this.notificationId,
     @required this.flutterLocalNotificationsPlugin,
   });
 
   @override
   List<Object> get props => [
         notificationName,
-        notificationId,
         flutterLocalNotificationsPlugin,
       ];
 }

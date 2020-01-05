@@ -1,7 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:reminder/core/error/exceptions.dart';
 import 'package:reminder/core/static/c_s_shared_prefs.dart';
+import 'package:reminder/core/utils/c_app_shared_pref_manager.dart';
+
 import 'package:reminder/core/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,98 +12,127 @@ import '../../../../core/error/failures.dart';
 import '../../domain/repositories/f_reminder_schedule_repo.dart';
 
 class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
+  final CAppSharedPrefManager cAppSharedPrefManager;
+
+  FReminderScheduleRepoImpl({@required this.cAppSharedPrefManager});
+
   @override
   Future<Either<Failure, bool>> setSchedule({
     Time time,
     String notificationName,
-    int notificationId,
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   }) async {
     try {
-      // Check if the notification is set
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      bool isSet =
-          prefs.getBool(CSSharedPrefs.ALARM + notificationName) ?? false;
+      // If the notification does't exist, create new one
+      if (!cAppSharedPrefManager.notificationExist(notificationName)) {
+        final int notificationId = cAppSharedPrefManager.createId();
+        final String notificationDescription =
+            'Time to take your prescription ${(time.hour).toString().padLeft(2, '0')}:${(time.minute).toString().padLeft(2, '0')}';
 
-      final androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-        '$notificationId',
-        '$notificationName',
-        'Time to take your prescription ${(time.hour).toString().padLeft(2, '0')}:${(time.minute).toString().padLeft(2, '0')}',
-        priority: Priority.High,
-        importance: Importance.High,
-        autoCancel: false,
-      );
-      final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-      final platformChannelSpecifics = new NotificationDetails(
-          androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-
-      await flutterLocalNotificationsPlugin.showDailyAtTime(
+        final PrescNotification prescNotification = PrescNotification(
           notificationId,
           notificationName,
-          'Time to take your prescription ${(time.hour).toString().padLeft(2, '0')}:${(time.minute).toString().padLeft(2, '0')}',
+          notificationDescription,
           time,
-          platformChannelSpecifics,
-          payload: PackPayload.call({"name": notificationName}));
+        );
 
-      prefs.setBool(CSSharedPrefs.ALARM + notificationName, true);
+        await _setNotification(
+          notificationId: notificationId,
+          notificationName: notificationName,
+          notificationDescription: notificationDescription,
+          time: time,
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+        );
 
-      print(
-          "notification set for ${(time.hour).toString().padLeft(2, '0')}:${(time.minute).toString().padLeft(2, '0')}");
+        cAppSharedPrefManager.addNotification(prescNotification);
 
-      return Right(true);
-    } on Exception catch (e) {
-      throw InternalFailure(message: e.toString());
-    }
-  }
+        // Debug purpose
+        print(notificationDescription);
 
-  @override
-  Future<Either<Failure, int>> getId({@required String name}) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      int globalCounter = prefs.get(CSSharedPrefs.GLOBAL_COUNTER) ?? 0;
-      int namedId = 0;
-
-      // If the globalCounter is 0, init it
-      if (globalCounter == 0) {
-        prefs.setInt(CSSharedPrefs.GLOBAL_COUNTER, 1);
-        namedId = 1;
-        prefs.setInt(CSSharedPrefs.COUNTER + name, namedId);
+        return Right(true);
       } else {
-        // If not check if the pref exist
-        namedId = prefs.get(name) ?? 0;
-        if (namedId == 0) {
-          // if it doest exist create it and increment the global counter
-          globalCounter = prefs.get(CSSharedPrefs.GLOBAL_COUNTER);
-          namedId = globalCounter + 1;
-          prefs.setInt(CSSharedPrefs.COUNTER + name, namedId);
-          prefs.setInt(CSSharedPrefs.GLOBAL_COUNTER, namedId);
-        }
-      }
+        // Update the notification time
+        final String notificationDescription =
+            'Time to take your prescription ${(time.hour).toString().padLeft(2, '0')}:${(time.minute).toString().padLeft(2, '0')}';
 
-      return Right(namedId);
-    } on Exception catch (e) {
-      throw InternalFailure(message: e.toString());
+        final PrescNotification oldNotification =
+            cAppSharedPrefManager.getNotification(notificationName);
+        final PrescNotification newNotification =
+            cAppSharedPrefManager.getNotification(notificationName);
+        final int notificationId = newNotification.notificationId;
+
+        await flutterLocalNotificationsPlugin.cancel(
+          newNotification.notificationId,
+        );
+
+        await _setNotification(
+          notificationId: notificationId,
+          notificationName: notificationName,
+          notificationDescription: notificationDescription,
+          time: time,
+          flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+        );
+
+        cAppSharedPrefManager.setNotification(
+          oldNotification,
+          newNotification,
+        );
+
+        // Debug purpose
+        print(notificationDescription);
+        return Right(true);
+      }
+    } on InternalException catch (e) {
+      return Left(InternalFailure(message: e.message));
     }
   }
 
   @override
   Future<Either<Failure, bool>> unsetSchedule({
-    int notificationId,
     String notificationName,
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   }) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      bool isSet =
-          prefs.getBool(CSSharedPrefs.ALARM + notificationName) ?? false;
-      if (isSet) {
-        await flutterLocalNotificationsPlugin.cancel(notificationId);
-        prefs.setBool(CSSharedPrefs.ALARM + notificationName, false);
+      if (cAppSharedPrefManager.notificationExist(notificationName)) {
+        final PrescNotification prescNotification =
+            cAppSharedPrefManager.getNotification(notificationName);
+        await flutterLocalNotificationsPlugin.cancel(
+          prescNotification.notificationId,
+        );
+        return Right(true);
+      } else {
+        return Right(false);
       }
-
-      return Right(true);
-    } on Exception catch (e) {
-      throw InternalFailure(message: e.toString());
+    } on InternalException catch (e) {
+      return Left(InternalFailure(message: e.message));
     }
+  }
+
+  Future<void> _setNotification({
+    @required int notificationId,
+    @required Time time,
+    @required String notificationName,
+    @required String notificationDescription,
+    @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+  }) async {
+    final androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      '$notificationId',
+      '$notificationName',
+      '$notificationDescription',
+      priority: Priority.High,
+      importance: Importance.High,
+      autoCancel: false,
+    );
+    final iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    final platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.showDailyAtTime(
+      notificationId,
+      notificationName,
+      notificationDescription,
+      time,
+      platformChannelSpecifics,
+    );
   }
 }

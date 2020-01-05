@@ -157,26 +157,9 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
     );
   }
 
-  /// Called once from init state to check if the app was launched from notification
-  /// And if so validate that the pill was taken
-  void _lanchedFromNotif(BuildContext context) async {
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        sl<FlutterLocalNotificationsPlugin>();
-    final notificationAppLaunchDetails =
-        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-
-    if (notificationAppLaunchDetails.didNotificationLaunchApp) {
-      final Map<String, dynamic> data =
-          UnpackPayload.call(notificationAppLaunchDetails.payload);
-      final String name = data["name"];
-      BlocProvider.of(context).add(FPrescValidatePillEvent(pillName: name));
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _lanchedFromNotif(context);
   }
 
   @override
