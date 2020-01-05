@@ -107,6 +107,7 @@ Future<void> fReminderSchedule() async {
   sl.registerLazySingleton<FReminderScheduleRepo>(
     () => FReminderScheduleRepoImpl(
       cAppSharedPrefManager: sl(),
+      cdPillDatasource: sl(),
     ),
   );
 }
