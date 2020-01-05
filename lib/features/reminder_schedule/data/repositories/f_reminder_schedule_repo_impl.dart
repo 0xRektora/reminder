@@ -1,20 +1,23 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:reminder/core/error/exceptions.dart';
-import 'package:reminder/core/static/c_s_shared_prefs.dart';
-import 'package:reminder/core/utils/c_app_shared_pref_manager.dart';
 
-import 'package:reminder/core/utils/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../../../core/data/datasources/c_d_pill_datasource.dart';
+import '../../../../core/data/models/c_d_app_pill_model.dart';
+import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/utils/c_app_converter.dart';
+import '../../../../core/utils/c_app_shared_pref_manager.dart';
 import '../../domain/repositories/f_reminder_schedule_repo.dart';
 
 class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
   final CAppSharedPrefManager cAppSharedPrefManager;
+  final CDPillDatasource cdPillDatasource;
 
-  FReminderScheduleRepoImpl({@required this.cAppSharedPrefManager});
+  FReminderScheduleRepoImpl({
+    @required this.cAppSharedPrefManager,
+    @required this.cdPillDatasource,
+  });
 
   @override
   Future<Either<Failure, bool>> setSchedule({
@@ -99,6 +102,7 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
         await flutterLocalNotificationsPlugin.cancel(
           prescNotification.notificationId,
         );
+        cAppSharedPrefManager.removeNotification(prescNotification);
         return Right(true);
       } else {
         return Right(false);
@@ -135,5 +139,44 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
       time,
       platformChannelSpecifics,
     );
+  }
+
+  @override
+  Future<Either<Failure, bool>> validate({
+    String uid,
+    CDAppPillModel cdAppPillModel,
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+  }) async {
+    try {
+      final PrescNotification prescNotification =
+          cAppSharedPrefManager.getNotification(cdAppPillModel.pillName);
+
+      final String today = CAppConverter.fromDatetimeToString(DateTime.now());
+
+      final Time timeToTake = Time(
+        cdAppPillModel.remindWhen.hour,
+        cdAppPillModel.remindWhen.minute,
+      );
+
+      cdPillDatasource.validatePill(
+        appPillModel: cdAppPillModel,
+        uid: uid,
+        date: today,
+      );
+
+      await unsetSchedule(
+        notificationName: cdAppPillModel.pillName,
+        flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+      );
+
+      await setSchedule(
+        notificationName: cdAppPillModel.pillName,
+        time: timeToTake,
+        flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
+      );
+      return Right(true);
+    } on InternalException catch (e) {
+      return Left(InternalFailure(message: e.message));
+    }
   }
 }

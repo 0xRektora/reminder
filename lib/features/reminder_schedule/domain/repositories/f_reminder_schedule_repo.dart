@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:reminder/core/data/models/c_d_app_pill_model.dart';
 
 import '../../../../core/error/failures.dart';
 
@@ -13,6 +14,12 @@ abstract class FReminderScheduleRepo {
   Future<Either<Failure, bool>> setSchedule({
     @required Time time,
     @required String notificationName,
+    @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+  });
+
+  Future<Either<Failure, bool>> validate({
+    @required String uid,
+    @required CDAppPillModel cdAppPillModel,
     @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   });
 }
