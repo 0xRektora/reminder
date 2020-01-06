@@ -2,14 +2,12 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:reminder/core/utils/utils.dart';
-import 'package:reminder/features/reminder_presc/presentation/widgets/reminder_presc_page.dart';
-import 'package:reminder/features/reminder_schedule/domain/usecases/f_reminder_schedule_unset_usecase.dart';
 
 import '../dependency_injector.dart';
 import '../features/calendar/presentation/pages/calendar_page.dart';
 import '../features/login/presentation/pages/login_page.dart';
 import '../features/prescriptions/presentation/pages/prescription_page.dart';
+import '../features/reminder_presc/presentation/pages/reminder_presc_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
 import 'bloc/bloc.dart';
 import 'static/c_s_styles.dart';
