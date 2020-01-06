@@ -34,7 +34,6 @@ class CDAppPillModel {
   }
 
   factory CDAppPillModel.fromSnapshot(Map<String, dynamic> ds) {
-    // TODO test the string to datetime
     return CDAppPillModel(
       pillName: ds[CSDbPillDoc.PILLNAME],
       total: ds[CSDbPillDoc.TOTAL],

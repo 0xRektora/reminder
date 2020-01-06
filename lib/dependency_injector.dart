@@ -26,6 +26,7 @@ import 'features/reminder_schedule/domain/usecases/f_reminder_schedule_set_useca
 
 final sl = GetIt.instance;
 
+// TODO implemend feature reminder presc
 Future<void> init() async {
   // Core
   cApp();

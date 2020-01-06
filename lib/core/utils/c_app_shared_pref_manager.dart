@@ -99,6 +99,7 @@ abstract class CAppSharedPrefManager {
     PrescNotification newPrescNotification,
   );
 
+  List<PrescNotification> getNotifications();
   bool notificationExist(String name);
 
   int createId();
@@ -281,5 +282,17 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
 
   Map<String, dynamic> _unpackPayload(String data) {
     return jsonDecode(data);
+  }
+
+  @override
+  List<PrescNotification> getNotifications() {
+    try {
+      _initNotificationData();
+
+      final _NotificationData _notificationData = _getNotificationData();
+      return _notificationData.notifications;
+    } on Exception catch (e) {
+      throw InternalException(message: e.toString());
+    }
   }
 }
