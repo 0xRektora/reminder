@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/features/reminder_presc/presentation/bloc/bloc.dart';
 
 import '../../../../dependency_injector.dart';
+import '../bloc/bloc.dart';
 
 class ReminderPrescPage extends StatefulWidget {
   ReminderPrescPage({Key key}) : super(key: key);
