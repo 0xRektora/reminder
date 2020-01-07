@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:reminder/core/data/models/c_d_app_pill_model.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../../prescriptions/domain/entities/f_pill_entity.dart';
 
 abstract class FReminderScheduleRepo {
   Future<Either<Failure, bool>> unsetSchedule({
@@ -19,7 +19,7 @@ abstract class FReminderScheduleRepo {
 
   Future<Either<Failure, bool>> validate({
     @required String uid,
-    @required CDAppPillModel cdAppPillModel,
+    @required FPPillEntity fpPillEntity,
     @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   });
 }

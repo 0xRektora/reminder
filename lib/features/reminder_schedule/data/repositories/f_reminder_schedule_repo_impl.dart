@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 
 import '../../../../core/data/datasources/c_d_pill_datasource.dart';
 import '../../../../core/data/models/c_d_app_pill_model.dart';
@@ -144,10 +145,19 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
   @override
   Future<Either<Failure, bool>> validate({
     String uid,
-    CDAppPillModel cdAppPillModel,
+    FPPillEntity fpPillEntity,
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   }) async {
     try {
+      final CDAppPillModel cdAppPillModel = CDAppPillModel(
+        current: fpPillEntity.current,
+        pillName: fpPillEntity.pillName,
+        qtyToTake: fpPillEntity.qtyToTake,
+        remindAt: fpPillEntity.remindAt,
+        remindWhen: fpPillEntity.remindWhen,
+        taken: fpPillEntity.taken,
+        total: fpPillEntity.total,
+      );
       final PrescNotification prescNotification =
           cAppSharedPrefManager.getNotification(cdAppPillModel.pillName);
 
