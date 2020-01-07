@@ -103,8 +103,8 @@ class CDPillDatasourceImpl implements CDPillDatasource {
       await Firestore.instance
           .collection(CSDbRoutes.PRESCRIPTIONS)
           .document(uid)
-          .collection(date)
-          .document(appPillModel.pillName)
+          .collection(CSDbPillHistoryDoc.PATH)
+          .document(date)
           .setData(appPillModel.toDoc());
       return true;
     } on ServerException catch (e) {
