@@ -12,6 +12,7 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
 
   FReminderPrescRepoImpl({@required this.cAppSharedPrefManager});
 
+  // TODO implement test if taken today
   @override
   Either<Failure, List<FReminderPrescPrescNotificationEntity>> listValidate({
     String uid,
