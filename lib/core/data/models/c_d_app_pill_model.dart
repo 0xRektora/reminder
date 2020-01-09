@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
-import 'package:reminder/core/static/c_s_db_routes.dart';
-import 'package:reminder/core/utils/c_app_converter.dart';
+
+import '../../static/c_s_db_routes.dart';
+import '../../utils/c_app_converter.dart';
 
 class CDAppPillModel {
   final String pillName;
