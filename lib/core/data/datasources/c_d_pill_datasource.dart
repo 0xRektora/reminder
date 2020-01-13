@@ -21,6 +21,10 @@ abstract class CDPillDatasource {
     @required CDAppPillModel appPillModel,
     @required String uid,
   });
+  Future<CDAppPillModel> getHistoryPill({
+    @required String uid,
+    @required String date,
+  });
   Future<bool> validatePill({
     @required String uid,
     @required CDAppPillModel appPillModel,
@@ -107,6 +111,33 @@ class CDPillDatasourceImpl implements CDPillDatasource {
           .document(date)
           .setData(appPillModel.toDoc());
       return true;
+    } on ServerException catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  /// Get [CDAppPillModel] for a history pill for the chosen day
+  ///
+  @override
+  Future<CDAppPillModel> getHistoryPill({
+    @required String uid,
+    @required String date,
+  }) async {
+    try {
+      final snapshotData = await Firestore.instance
+          .collection(CSDbRoutes.PRESCRIPTIONS)
+          .document(uid)
+          .collection(CSDbPillHistoryDoc.PATH)
+          .document(date)
+          .get();
+      if (snapshotData.exists) {
+        final CDAppPillModel appPillModel =
+            CDAppPillModel.fromSnapshot(snapshotData.data);
+
+        return appPillModel;
+      } else {
+        return null;
+      }
     } on ServerException catch (e) {
       throw ServerException(message: e.toString());
     }
