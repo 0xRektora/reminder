@@ -1,8 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
-import 'package:reminder/core/utils/c_app_shared_pref_manager.dart';
-import 'package:reminder/features/reminder_schedule/domain/usecases/f_reminder_schedule_unset_usecase.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/bloc/app_bloc.dart';
 import 'core/data/datasources/c_d_pill_datasource.dart';
@@ -12,6 +9,7 @@ import 'core/usecases/c_app_add_pill_usecase.dart';
 import 'core/usecases/c_app_all_pill_usecase.dart';
 import 'core/usecases/c_app_delete_pill_usecase.dart';
 import 'core/usecases/c_app_get_pill_usecase.dart';
+import 'core/utils/c_app_shared_pref_manager.dart';
 import 'features/calendar/presentation/bloc/bloc.dart';
 import 'features/login/data/datasources/login_data_source.dart';
 import 'features/login/data/repositories/login_repository_impl.dart';
@@ -20,9 +18,15 @@ import 'features/login/domain/usecases/login_from_cache.dart';
 import 'features/login/domain/usecases/login_with_google.dart';
 import 'features/login/presentation/bloc/bloc.dart';
 import 'features/prescriptions/presentation/bloc/bloc.dart';
+import 'features/reminder_presc/data/repositories/f_reminder_presc_repo_impl.dart';
+import 'features/reminder_presc/domain/repositories/f_reminder_presc_repo.dart';
+import 'features/reminder_presc/domain/usecases/f_reminder_presc_list_validate.dart';
+import 'features/reminder_presc/domain/usecases/f_reminder_presc_validate_usecase.dart';
+import 'features/reminder_presc/presentation/bloc/bloc.dart';
 import 'features/reminder_schedule/data/repositories/f_reminder_schedule_repo_impl.dart';
 import 'features/reminder_schedule/domain/repositories/f_reminder_schedule_repo.dart';
 import 'features/reminder_schedule/domain/usecases/f_reminder_schedule_set_usecase.dart';
+import 'features/reminder_schedule/domain/usecases/f_reminder_schedule_unset_usecase.dart';
 
 final sl = GetIt.instance;
 
@@ -109,6 +113,37 @@ Future<void> fReminderSchedule() async {
     () => FReminderScheduleRepoImpl(
       cAppSharedPrefManager: sl(),
       cdPillDatasource: sl(),
+    ),
+  );
+}
+
+Future<void> fReminderPresc() async {
+  // Bloc
+  sl.registerFactory(
+    () => ReminderPrescBloc(
+      fReminderPrescValidateUsecase: sl(),
+      fReminderPrescListValidateUsecase: sl(),
+    ),
+  );
+
+  // Usecases
+  sl.registerLazySingleton(
+    () => FReminderPrescListValidateUsecase(
+      fReminderPrescRepo: sl<FReminderPrescRepo>(),
+    ),
+  );
+
+  sl.registerLazySingleton(
+    () => FReminderPrescValidateUsecase(
+      fReminderScheduleRepo: sl<FReminderScheduleRepo>(),
+    ),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<FReminderPrescRepo>(
+    () => FReminderPrescRepoImpl(
+      cAppSharedPrefManager: sl(),
+      pillDatasourceImpl: sl(),
     ),
   );
 }
