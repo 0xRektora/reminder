@@ -1,11 +1,10 @@
-import 'package:dartz/dartz_unsafe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/features/reminder_presc/domain/entities/f_reminder_presc_presc_notification_entity.dart';
-import 'package:reminder/features/reminder_presc/presentation/widgets/f_reminder_presc_tile_widget.dart';
 
 import '../../../../dependency_injector.dart';
+import '../../domain/entities/f_reminder_presc_presc_notification_entity.dart';
 import '../bloc/bloc.dart';
+import '../widgets/f_reminder_presc_tile_widget.dart';
 
 class ReminderPrescPage extends StatefulWidget {
   ReminderPrescPage({Key key}) : super(key: key);
