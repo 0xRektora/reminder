@@ -143,7 +143,7 @@ Future<void> fReminderPresc() async {
   sl.registerLazySingleton<FReminderPrescRepo>(
     () => FReminderPrescRepoImpl(
       cAppSharedPrefManager: sl(),
-      pillDatasourceImpl: sl(),
+      pillDatasource: sl(),
     ),
   );
 }
