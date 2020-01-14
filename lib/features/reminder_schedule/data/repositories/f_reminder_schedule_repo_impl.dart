@@ -158,8 +158,6 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
         taken: fpPillEntity.taken,
         total: fpPillEntity.total,
       );
-      final PrescNotification prescNotification =
-          cAppSharedPrefManager.getNotification(cdAppPillModel.pillName);
 
       final String today = CAppConverter.fromDatetimeToString(DateTime.now());
 
