@@ -89,6 +89,9 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
     } on InternalException catch (e) {
       print("Error FReminderScheduleRepoImpl" + e.message);
       return Left(InternalFailure(message: e.message));
+    } on Exception catch (e) {
+      print("Error FReminderScheduleRepoImpl" + e.toString());
+      return Left(InternalFailure(message: e.toString()));
     }
   }
 
