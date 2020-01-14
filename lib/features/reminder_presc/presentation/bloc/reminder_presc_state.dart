@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
+
+import '../../domain/entities/f_reminder_presc_presc_notification_entity.dart';
 
 abstract class ReminderPrescState extends Equatable {
   const ReminderPrescState();
@@ -11,10 +12,10 @@ abstract class ReminderPrescState extends Equatable {
 class InitialReminderPrescState extends ReminderPrescState {}
 
 class FReminderPrescListState extends ReminderPrescState {
-  final List<FPPillEntity> pillEnitityList;
+  final List<FReminderPrescPrescNotificationEntity> prescNotificationEntity;
 
-  FReminderPrescListState({@required this.pillEnitityList});
+  FReminderPrescListState({@required this.prescNotificationEntity});
 
   @override
-  List<Object> get props => [pillEnitityList];
+  List<Object> get props => [prescNotificationEntity];
 }
