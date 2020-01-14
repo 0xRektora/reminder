@@ -46,6 +46,9 @@ Future<void> init() async {
 
   // Feature calendar
   fCalendar();
+
+  // Feature reminder presc
+  fReminderPresc();
 }
 
 Future<void> cApp() async {
