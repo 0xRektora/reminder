@@ -35,22 +35,29 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
     }
   }
 
-  // TODO implement test if taken today
-  Future<PrescNotification> _prescNotificationFilter({
-    @required PrescNotification prescNotif,
+  List<PrescNotification> _prescNotificationFilter({
+    @required List<PrescNotification> prescNotification,
     @required String today,
     @required String uid,
     @required DateTime now,
-  }) async {
-    if (await _isPrescTaken(today: today, uid: uid)) {
-      if (now.hour > prescNotif.timeToTake.hour) {
-        return prescNotif;
-      } else if (now.hour >= prescNotif.timeToTake.hour) {
-        if (now.minute >= prescNotif.timeToTake.minute) {
-          return prescNotif;
-        }
-      }
-    }
+  }) {
+    return prescNotification.map(
+      (prescNotif) {
+        _isPrescTaken(today: today, uid: uid).then(
+          (isTaken) {
+            if (!isTaken) {
+              if (now.hour > prescNotif.timeToTake.hour) {
+                return prescNotif;
+              } else if (now.hour >= prescNotif.timeToTake.hour) {
+                if (now.minute >= prescNotif.timeToTake.minute) {
+                  return prescNotif;
+                }
+              }
+            }
+          },
+        );
+      },
+    ).toList();
   }
 
   @override
@@ -64,16 +71,12 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
       final DateTime now = DateTime.now();
       final String today = CAppConverter.fromDatetimeToString(now);
 
-      final List<PrescNotification> result = prescNotification
-          .map(
-            (prescNotif) async => await _prescNotificationFilter(
-              now: now,
-              prescNotif: prescNotif,
-              today: today,
-              uid: uid,
-            ),
-          )
-          .toList();
+      final List<PrescNotification> result = _prescNotificationFilter(
+        now: now,
+        prescNotification: prescNotification,
+        today: today,
+        uid: uid,
+      );
 
       final List<FReminderPrescPrescNotificationEntity> castedResult =
           result.map(
