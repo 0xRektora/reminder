@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 
 import '../../../../core/data/datasources/c_d_pill_datasource.dart';
 import '../../../../core/data/models/c_d_app_pill_model.dart';
@@ -9,6 +8,7 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/c_app_converter.dart';
 import '../../../../core/utils/c_app_shared_pref_manager.dart';
+import '../../../prescriptions/domain/entities/f_pill_entity.dart';
 import '../../domain/repositories/f_reminder_schedule_repo.dart';
 
 class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
@@ -20,6 +20,7 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
     @required this.cdPillDatasource,
   });
 
+  // TODO fix the recursion if changing a notification the notification changed for all
   @override
   Future<Either<Failure, bool>> setSchedule({
     Time time,
@@ -40,6 +41,8 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
           time,
         );
 
+        cAppSharedPrefManager.addNotification(prescNotification);
+
         await _setNotification(
           notificationId: notificationId,
           notificationName: notificationName,
@@ -47,8 +50,6 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
           time: time,
           flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
         );
-
-        cAppSharedPrefManager.addNotification(prescNotification);
 
         // Debug purpose
         print(notificationDescription);
@@ -61,9 +62,13 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
 
         final PrescNotification oldNotification =
             cAppSharedPrefManager.getNotification(notificationName);
-        final PrescNotification newNotification =
-            cAppSharedPrefManager.getNotification(notificationName);
+        final PrescNotification newNotification = oldNotification;
         final int notificationId = newNotification.notificationId;
+
+        cAppSharedPrefManager.setNotification(
+          oldNotification,
+          newNotification,
+        );
 
         await flutterLocalNotificationsPlugin.cancel(
           newNotification.notificationId,
@@ -77,16 +82,12 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
           flutterLocalNotificationsPlugin: flutterLocalNotificationsPlugin,
         );
 
-        cAppSharedPrefManager.setNotification(
-          oldNotification,
-          newNotification,
-        );
-
         // Debug purpose
         print(notificationDescription);
         return Right(true);
       }
     } on InternalException catch (e) {
+      print("Error FReminderScheduleRepoImpl" + e.message);
       return Left(InternalFailure(message: e.message));
     }
   }

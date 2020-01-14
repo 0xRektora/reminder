@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:reminder/core/utils/c_app_converter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../error/exceptions.dart';
 import '../static/c_s_shared_prefs.dart';
+import 'c_app_converter.dart';
 
 class _NotificationData {
-  final int counterId;
+  int counterId;
   final List<PrescNotification> notifications;
 
   _NotificationData(
@@ -136,6 +136,7 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
     }
   }
 
+  // TODO increment _notificationData.counterId
   @override
   void addNotification(PrescNotification prescNotification) {
     try {
@@ -143,6 +144,7 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
 
       final _NotificationData _notificationData = _getNotificationData();
       _notificationData.notifications.add(prescNotification);
+      _notificationData.counterId++;
 
       _setNotificationData(_notificationData);
     } on Exception catch (e) {
@@ -166,28 +168,31 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
     }
   }
 
+  /// Get the [PrescNotification] from the parameter name
+  ///
+  /// Throw exception if not found
   @override
   PrescNotification getNotification(String name) {
     try {
       _initNotificationData();
 
       final _NotificationData _notificationData = _getNotificationData();
-      if (_notificationData.notifications.every(
-        (prescription) => prescription.notificationName == name,
-      )) {
-        return _notificationData.notifications
-            .where(
-              (prescription) => prescription.notificationName == name,
-            )
-            .toList()[0];
-      } else {
-        throw InternalException(message: "notification don't exist");
+
+      for (PrescNotification prescNotification
+          in _notificationData.notifications) {
+        if (prescNotification.notificationName == name) {
+          return prescNotification;
+        }
       }
+      throw InternalException(message: "notification don't exist");
+    } on InternalException catch (e) {
+      throw InternalException(message: e.message);
     } on Exception catch (e) {
       throw InternalException(message: e.toString());
     }
   }
 
+  // TODO bugfixe not working
   @override
   void setNotification(
     PrescNotification oldPrescNotification,
@@ -219,6 +224,7 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
     }
   }
 
+  // TODO bugfix every bloc code
   @override
   bool notificationExist(String name) {
     try {
@@ -226,14 +232,15 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
 
       final _NotificationData _notificationData = _getNotificationData();
       if (_notificationData.notifications.length == 0) {
-        print('notifications lenght is 0');
+        print('notifications length is 0');
         return false;
-      } else if (_notificationData.notifications.every(
-        (prescription) => prescription.notificationName == name,
-      )) {
-        print('notifications exist');
-        return true;
       } else {
+        for (PrescNotification prescNotification
+            in _notificationData.notifications) {
+          if (prescNotification.notificationName == name) {
+            return true;
+          }
+        }
         print('notifications doest exist');
         return false;
       }
