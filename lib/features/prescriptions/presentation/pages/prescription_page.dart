@@ -110,6 +110,7 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       onLongPress: () => FPrescFormWidgetState(
         pillEntity: pillEntity,
         title: title,
+        onChange: true,
       ).showAlert(context, title),
     );
   }
