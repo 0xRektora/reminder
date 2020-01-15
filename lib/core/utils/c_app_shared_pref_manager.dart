@@ -202,23 +202,27 @@ class CAppSharedPrefManagerImpl implements CAppSharedPrefManager {
       _initNotificationData();
 
       final _NotificationData _notificationData = _getNotificationData();
+      int notificationIndex = -1;
+
       for (PrescNotification prescNotification
           in _notificationData.notifications) {
         if (prescNotification.notificationName ==
             oldPrescNotification.notificationName) {
-          int notificationIndex = _notificationData.notifications.indexWhere(
+          notificationIndex = _notificationData.notifications.indexWhere(
             (prescription) =>
                 prescription.notificationName ==
                 oldPrescNotification.notificationName,
           );
-
-          _notificationData.notifications[notificationIndex] =
-              newPrescNotification;
-          _setNotificationData(_notificationData);
         }
       }
-      // If not found throw exception
-      throw InternalException(message: "notification don't exist");
+      if (notificationIndex >= 0) {
+        _notificationData.notifications[notificationIndex] =
+            newPrescNotification;
+        _setNotificationData(_notificationData);
+      } else {
+        // If not found throw exception
+        throw InternalException(message: "notification don't exist");
+      }
     } on InternalException catch (e) {
       throw InternalException(message: e.message);
     } on Exception catch (e) {

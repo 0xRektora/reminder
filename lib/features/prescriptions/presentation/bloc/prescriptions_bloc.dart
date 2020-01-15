@@ -152,11 +152,10 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
       );
       yield* usecase.fold(
         (failure) async* {
-          print("Error:${failure.message}");
-          yield FPrescAddPillState(uid: event.uid);
+          print("Error PrescriptionsBloc :${failure.message}");
         },
         (success) async* {
-          print("Success:${success}");
+          print("Success:$success");
           yield FPrescAddPillState(uid: event.uid);
         },
       );

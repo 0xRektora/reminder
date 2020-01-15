@@ -62,7 +62,14 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
 
         final PrescNotification oldNotification =
             cAppSharedPrefManager.getNotification(notificationName);
-        final PrescNotification newNotification = oldNotification;
+
+        final PrescNotification newNotification = PrescNotification(
+          oldNotification.notificationId,
+          notificationName,
+          notificationDescription,
+          time,
+        );
+
         final int notificationId = newNotification.notificationId;
 
         cAppSharedPrefManager.setNotification(
