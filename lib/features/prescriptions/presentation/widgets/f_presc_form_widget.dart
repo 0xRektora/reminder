@@ -26,6 +26,9 @@ class FPrescFormWidgetState {
   final FPPillEntity pillEntity;
   final String title;
 
+  /// Toggle if readOnly for textFormbuilders
+  final bool onChange;
+
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
 
   FormBuilderTextField pillName;
@@ -43,6 +46,7 @@ class FPrescFormWidgetState {
   FPrescFormWidgetState({
     @required this.title,
     this.pillEntity,
+    this.onChange = false,
   }) {
     _initFormBuilder();
   }
@@ -189,6 +193,7 @@ class FPrescFormWidgetState {
     final String pillNameInitValue =
         this.pillEntity == null ? "" : this.pillEntity.pillName ?? "";
     pillName = FormBuilderTextField(
+      readOnly: this.onChange,
       attribute: "pillName",
       initialValue: pillNameInitValue,
       maxLength: 25,
@@ -204,6 +209,7 @@ class FPrescFormWidgetState {
     final String totalInitValue =
         this.pillEntity == null ? "" : "${this.pillEntity.total}" ?? "";
     total = FormBuilderTextField(
+      readOnly: this.onChange,
       attribute: "total",
       initialValue: totalInitValue,
       keyboardType: TextInputType.number,
@@ -222,6 +228,7 @@ class FPrescFormWidgetState {
     final String currentInitValue =
         this.pillEntity == null ? "" : "${this.pillEntity.current}" ?? "";
     current = FormBuilderTextField(
+      readOnly: this.onChange,
       attribute: "current",
       initialValue: currentInitValue,
       keyboardType: TextInputType.number,
@@ -240,6 +247,7 @@ class FPrescFormWidgetState {
     final String qtyToTakeInitValue =
         this.pillEntity == null ? "" : "${this.pillEntity.qtyToTake}" ?? "";
     qtyToTake = FormBuilderTextField(
+      readOnly: this.onChange,
       attribute: "qtyToTake",
       initialValue: qtyToTakeInitValue,
       keyboardType: TextInputType.number,
@@ -258,6 +266,7 @@ class FPrescFormWidgetState {
     final String remindAtInitValue =
         this.pillEntity == null ? "" : "${this.pillEntity.remindAt}" ?? "";
     remindAt = FormBuilderTextField(
+      readOnly: this.onChange,
       attribute: "remindAt",
       initialValue: remindAtInitValue,
       keyboardType: TextInputType.number,
