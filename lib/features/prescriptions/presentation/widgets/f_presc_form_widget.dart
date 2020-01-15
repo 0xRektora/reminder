@@ -115,7 +115,6 @@ class FPrescFormWidgetState {
         ],
       ),
     );
-    ;
   }
 
   Future<bool> _confirmForm(BuildContext context) async {
