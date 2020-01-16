@@ -9,22 +9,22 @@ import '../repositories/f_reminder_presc_repo.dart';
 
 class FReminderPrescListValidateUsecase extends Usecase<
     List<FReminderPrescPrescNotificationEntity>,
-    FReminderPrescValidateUsecaseParam> {
+    FReminderPrescListValidateUsecaseParam> {
   final FReminderPrescRepo fReminderPrescRepo;
 
   FReminderPrescListValidateUsecase({@required this.fReminderPrescRepo});
 
   @override
   Future<Either<Failure, List<FReminderPrescPrescNotificationEntity>>> call(
-      FReminderPrescValidateUsecaseParam params) async {
+      FReminderPrescListValidateUsecaseParam params) async {
     return fReminderPrescRepo.listValidate(uid: params.uid);
   }
 }
 
-class FReminderPrescValidateUsecaseParam extends Equatable {
+class FReminderPrescListValidateUsecaseParam extends Equatable {
   final String uid;
 
-  FReminderPrescValidateUsecaseParam({@required this.uid});
+  FReminderPrescListValidateUsecaseParam({@required this.uid});
 
   @override
   List<Object> get props => [uid];
