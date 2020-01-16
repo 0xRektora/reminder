@@ -24,6 +24,7 @@ abstract class CDPillDatasource {
   Future<CDAppPillModel> getHistoryPill({
     @required String uid,
     @required String date,
+    @required String pillName,
   });
   Future<bool> validatePill({
     @required String uid,
@@ -31,6 +32,8 @@ abstract class CDPillDatasource {
     @required String date,
   });
 }
+
+// TODO rework the function for managing the backend path
 
 class CDPillDatasourceImpl implements CDPillDatasource {
   @override
@@ -109,6 +112,8 @@ class CDPillDatasourceImpl implements CDPillDatasource {
           .document(uid)
           .collection(CSDbPillHistoryDoc.PATH)
           .document(date)
+          .collection(CSDbPillDoc.PATH)
+          .document(appPillModel.pillName)
           .setData(appPillModel.toDoc());
       return true;
     } on ServerException catch (e) {
@@ -116,12 +121,14 @@ class CDPillDatasourceImpl implements CDPillDatasource {
     }
   }
 
-  /// Get [CDAppPillModel] for a history pill for the chosen day
+  /// Get [CDAppPillModel] for a history of pill for the chosen day
   ///
+  /// Return null if not found
   @override
   Future<CDAppPillModel> getHistoryPill({
     @required String uid,
     @required String date,
+    @required String pillName,
   }) async {
     try {
       final snapshotData = await Firestore.instance
@@ -129,6 +136,8 @@ class CDPillDatasourceImpl implements CDPillDatasource {
           .document(uid)
           .collection(CSDbPillHistoryDoc.PATH)
           .document(date)
+          .collection(CSDbPillDoc.PATH)
+          .document(pillName)
           .get();
       if (snapshotData.exists) {
         final CDAppPillModel appPillModel =
@@ -138,7 +147,7 @@ class CDPillDatasourceImpl implements CDPillDatasource {
       } else {
         return null;
       }
-    } on ServerException catch (e) {
+    } on Exception catch (e) {
       throw ServerException(message: e.toString());
     }
   }
