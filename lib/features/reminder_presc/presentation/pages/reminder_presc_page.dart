@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:reminder/core/bloc/bloc.dart';
+import 'package:reminder/features/prescriptions/presentation/widgets/f_presc_presc_tile_widget.dart';
 
 import '../../../../dependency_injector.dart';
 import '../../domain/entities/f_reminder_presc_presc_notification_entity.dart';
@@ -14,44 +16,67 @@ class ReminderPrescPage extends StatefulWidget {
 }
 
 class _ReminderPrescPageState extends State<ReminderPrescPage> {
-  Widget _buildListNotifiction(
+  /// Used for [_buildPrescPage]
+  ///
+  /// Takes a list of [FReminderPrescPrescNotificationEntity]
+  List<FRprescTileWidget> _buildListNotifiction(
+    BuildContext context,
     List<FReminderPrescPrescNotificationEntity> listPrescNotificationEntity,
   ) {
     List<FRprescTileWidget> prescTileWidget = [];
-    for (var prescNtoficationEntity in listPrescNotificationEntity) {
+    for (FReminderPrescPrescNotificationEntity prescNtoficationEntity
+        in listPrescNotificationEntity) {
       prescTileWidget.add(
         FRprescTileWidget(
           prescNotificationEntity: prescNtoficationEntity,
         ),
       );
     }
+    return prescTileWidget;
   }
 
+  /// Builder for the main page content
   Widget _buildPrescPage(
     BuildContext context, {
-    List<Widget> listNotification,
+    List<FRprescTileWidget> listNotification,
   }) {
-    return SingleChildScrollView(
-      child: ListView.separated(
-        itemBuilder: (BuildContext context, int index) {
-          return listNotification[index];
-        },
-        itemCount: listNotification.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return Divider(
-            color: Colors.grey,
-          );
-        },
-      ),
+    return ListView.separated(
+      itemBuilder: (BuildContext context, int index) {
+        return listNotification[index];
+      },
+      itemCount: listNotification.length,
+      separatorBuilder: (BuildContext context, int index) {
+        return const Divider(
+          height: 5,
+        );
+      },
     );
   }
 
   Widget _blocStateBuilder(BuildContext context, ReminderPrescState state) {
     if (state is InitialReminderPrescState) {
-      return Container();
+      final state = BlocProvider.of<AppBloc>(context).state;
+      if (state is AppLoggedState) {
+        BlocProvider.of<ReminderPrescBloc>(context).add(
+          FReminderPrescListEvent(uid: state.user.uid),
+        );
+        return Container();
+      }
     }
-    // TODO implemend functuin _buildPrescPage
-    if (state is FReminderPrescListState) {}
+
+    if (state is FReminderPrescListState) {
+      if (state.prescNotificationEntity.length == 0) {
+        return Container();
+      } else {
+        return _buildPrescPage(
+          context,
+          listNotification: _buildListNotifiction(
+            context,
+            state.prescNotificationEntity,
+          ),
+        );
+      }
+    }
   }
 
   void _blocListener(BuildContext context, ReminderPrescState state) {}
