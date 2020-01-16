@@ -19,13 +19,17 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
     @required this.pillDatasource,
   });
 
+  /// Function that return a future boolean of wheather the pill
+  /// was taken or not.
   Future<bool> _isPrescTaken({
     @required String uid,
     @required String today,
+    @required String pillName,
   }) async {
     final CDAppPillModel historyPillModel = await pillDatasource.getHistoryPill(
       uid: uid,
       date: today,
+      pillName: pillName,
     );
 
     if (historyPillModel == null) {
@@ -35,35 +39,39 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
     }
   }
 
-  List<PrescNotification> _prescNotificationFilter({
+  Future<List<PrescNotification>> _prescNotificationFilter({
     @required List<PrescNotification> prescNotification,
     @required String today,
     @required String uid,
     @required DateTime now,
-  }) {
-    return prescNotification.map(
-      (prescNotif) {
-        _isPrescTaken(today: today, uid: uid).then(
-          (isTaken) {
-            if (!isTaken) {
-              if (now.hour > prescNotif.timeToTake.hour) {
-                return prescNotif;
-              } else if (now.hour >= prescNotif.timeToTake.hour) {
-                if (now.minute >= prescNotif.timeToTake.minute) {
-                  return prescNotif;
-                }
-              }
-            }
-          },
-        );
-      },
-    ).toList();
+  }) async {
+    final List<PrescNotification> result = [];
+    for (PrescNotification prescNotif in prescNotification) {
+      final bool isTaken = await _isPrescTaken(
+        today: today,
+        uid: uid,
+        pillName: prescNotif.notificationName,
+      );
+
+      if (!isTaken) {
+        if (now.hour > prescNotif.timeToTake.hour) {
+          result.add(prescNotif);
+        } else if (now.hour >= prescNotif.timeToTake.hour) {
+          if (now.minute >= prescNotif.timeToTake.minute) {
+            result.add(prescNotif);
+          }
+        }
+      }
+    }
+
+    return result;
   }
 
   @override
-  Either<Failure, List<FReminderPrescPrescNotificationEntity>> listValidate({
+  Future<Either<Failure, List<FReminderPrescPrescNotificationEntity>>>
+      listValidate({
     String uid,
-  }) {
+  }) async {
     try {
       final List<PrescNotification> prescNotification =
           cAppSharedPrefManager.getNotifications();
@@ -71,7 +79,7 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
       final DateTime now = DateTime.now();
       final String today = CAppConverter.fromDatetimeToString(now);
 
-      final List<PrescNotification> result = _prescNotificationFilter(
+      final List<PrescNotification> result = await _prescNotificationFilter(
         now: now,
         prescNotification: prescNotification,
         today: today,
@@ -81,7 +89,7 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
       final List<FReminderPrescPrescNotificationEntity> castedResult =
           result.map(
         (prescNotif) {
-          FReminderPrescPrescNotificationEntity(
+          return FReminderPrescPrescNotificationEntity(
             notificationDetails: prescNotif.notificationDetails,
             notificationId: prescNotif.notificationId,
             notificationName: prescNotif.notificationName,
@@ -92,6 +100,8 @@ class FReminderPrescRepoImpl extends FReminderPrescRepo {
 
       return Right(castedResult);
     } on InternalException catch (e) {
+      return Left(InternalFailure(message: e.message));
+    } on ServerException catch (e) {
       return Left(InternalFailure(message: e.message));
     } on Exception catch (e) {
       return Left(InternalFailure(message: e.toString()));
