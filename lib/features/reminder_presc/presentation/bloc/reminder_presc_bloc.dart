@@ -23,7 +23,21 @@ class ReminderPrescBloc extends Bloc<ReminderPrescEvent, ReminderPrescState> {
     ReminderPrescEvent event,
   ) async* {
     if (event is FReminderPrescListEvent) {
-      // TODO yield list state
+      final usecase = await fReminderPrescListValidateUsecase(
+        FReminderPrescListValidateUsecaseParam(
+          uid: event.uid,
+        ),
+      );
+
+      yield* usecase.fold(
+        (failure) async* {
+          print("Failure FReminderPrescListEvent: " + failure.message);
+        },
+        (success) async* {
+          print("Success FReminderPrescListEvent");
+          yield FReminderPrescListState(prescNotificationEntity: success);
+        },
+      );
     }
 
     if (event is FReminderPrescValidateEvent) {
