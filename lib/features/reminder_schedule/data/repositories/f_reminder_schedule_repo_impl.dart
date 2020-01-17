@@ -8,7 +8,6 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/c_app_converter.dart';
 import '../../../../core/utils/c_app_shared_pref_manager.dart';
-import '../../../prescriptions/domain/entities/f_pill_entity.dart';
 import '../../domain/repositories/f_reminder_schedule_repo.dart';
 
 class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
@@ -156,19 +155,16 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
   @override
   Future<Either<Failure, bool>> validate({
     String uid,
-    FPPillEntity fpPillEntity,
+    String pillName,
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
   }) async {
     try {
-      final CDAppPillModel cdAppPillModel = CDAppPillModel(
-        current: fpPillEntity.current,
-        pillName: fpPillEntity.pillName,
-        qtyToTake: fpPillEntity.qtyToTake,
-        remindAt: fpPillEntity.remindAt,
-        remindWhen: fpPillEntity.remindWhen,
-        taken: fpPillEntity.taken,
-        total: fpPillEntity.total,
+      final CDAppPillModel cdAppPillModel = await cdPillDatasource.getPill(
+        uid: uid,
+        pillName: pillName,
       );
+
+      cdAppPillModel.taken = true;
 
       final String today = CAppConverter.fromDatetimeToString(DateTime.now());
 

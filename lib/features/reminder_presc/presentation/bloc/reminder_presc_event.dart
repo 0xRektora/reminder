@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 
 abstract class ReminderPrescEvent extends Equatable {
   const ReminderPrescEvent();
@@ -11,17 +10,17 @@ abstract class ReminderPrescEvent extends Equatable {
 
 class FReminderPrescValidateEvent extends ReminderPrescEvent {
   final String uid;
-  final FPPillEntity fpPillEntity;
+  final String pillName;
 
   FReminderPrescValidateEvent({
     @required this.uid,
-    @required this.fpPillEntity,
+    @required this.pillName,
   });
 
   @override
   List<Object> get props => [
         uid,
-        fpPillEntity,
+        pillName,
       ];
 }
 

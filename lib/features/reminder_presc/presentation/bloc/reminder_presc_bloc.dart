@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
 import './bloc.dart';
+import '../../../../dependency_injector.dart';
 import '../../domain/usecases/f_reminder_presc_list_validate.dart';
 import '../../domain/usecases/f_reminder_presc_validate_usecase.dart';
 
@@ -41,7 +42,23 @@ class ReminderPrescBloc extends Bloc<ReminderPrescEvent, ReminderPrescState> {
     }
 
     if (event is FReminderPrescValidateEvent) {
-      // TODO validate the entry
+      final usecase = await fReminderPrescValidateUsecase(
+        FReminderPrescValidateUsecaseParam(
+          flutterLocalNotificationsPlugin: sl(),
+          pillName: event.pillName,
+          uid: event.uid,
+        ),
+      );
+
+      yield* usecase.fold(
+        (failure) async* {
+          print("Failure FReminderPrescValidateEvent: " + failure.message);
+        },
+        (success) async* {
+          print("Success FReminderPrescValidateEvent");
+          yield FReminderPrescValidateState(uid: event.uid);
+        },
+      );
     }
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/core/bloc/bloc.dart';
-import 'package:reminder/features/prescriptions/presentation/widgets/f_presc_presc_tile_widget.dart';
 
+import '../../../../core/bloc/bloc.dart';
 import '../../../../dependency_injector.dart';
 import '../../domain/entities/f_reminder_presc_presc_notification_entity.dart';
 import '../bloc/bloc.dart';
@@ -62,9 +61,7 @@ class _ReminderPrescPageState extends State<ReminderPrescPage> {
         );
         return Container();
       }
-    }
-
-    if (state is FReminderPrescListState) {
+    } else if (state is FReminderPrescListState) {
       if (state.prescNotificationEntity.length == 0) {
         return Container();
       } else {
@@ -76,10 +73,18 @@ class _ReminderPrescPageState extends State<ReminderPrescPage> {
           ),
         );
       }
+    } else {
+      return Container();
     }
   }
 
-  void _blocListener(BuildContext context, ReminderPrescState state) {}
+  void _blocListener(BuildContext context, ReminderPrescState state) {
+    if (state is FReminderPrescValidateState) {
+      BlocProvider.of<ReminderPrescBloc>(context).add(
+        FReminderPrescListEvent(uid: state.uid),
+      );
+    }
+  }
 
   Widget _blocBuilder(BuildContext context) {
     return BlocListener<ReminderPrescBloc, ReminderPrescState>(

@@ -19,3 +19,12 @@ class FReminderPrescListState extends ReminderPrescState {
   @override
   List<Object> get props => [prescNotificationEntity];
 }
+
+class FReminderPrescValidateState extends ReminderPrescState {
+  final String uid;
+
+  FReminderPrescValidateState({@required this.uid});
+
+  @override
+  List<Object> get props => [uid];
+}
