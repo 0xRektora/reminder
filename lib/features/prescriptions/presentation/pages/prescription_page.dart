@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:reminder/core/utils/utils.dart';
 
 import '../../../../core/bloc/app_bloc.dart';
 import '../../../../core/bloc/bloc.dart';
@@ -156,11 +154,6 @@ class _PrescriptionPageState extends State<PrescriptionPage> {
       ),
       listener: _featureBlocListener,
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
