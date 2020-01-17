@@ -20,31 +20,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
-
-  Future<void> _onSelectNotification(String t) {
-    print("onSelectNotification" + t);
-
-    return null;
-  }
-
-  Future<void> _initLocalNotif() {
-    final initializationSettingsAndroid =
-        new AndroidInitializationSettings('ic_launcher');
-    // IOS not needed
-    final initializationSettingsIOS = IOSInitializationSettings();
-    final initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (t) => _onSelectNotification(t));
-    return null;
-  }
-
   @override
   void initState() {
     super.initState();
-    _flutterLocalNotificationsPlugin = sl<FlutterLocalNotificationsPlugin>();
-    _initLocalNotif();
   }
 
   @override
@@ -67,6 +45,9 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  static const animationSpeed = Duration(milliseconds: 500);
+  static const reminderPrescPagePlace = 2;
+
   int _selectedItem = 0;
 
   PageController _pageController = PageController();
@@ -125,6 +106,29 @@ class _AppState extends State<App> {
         activeColor: CSBottomNavBarStyle.activeColor),
   ];
 
+  Future<void> _onSelectNotification() {
+    _pageController.animateToPage(
+      _AppState.reminderPrescPagePlace,
+      duration: _AppState.animationSpeed,
+      curve: Curves.linear,
+    );
+    return null;
+  }
+
+  Future<void> _initLocalNotif({
+    @required FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin,
+  }) {
+    final initializationSettingsAndroid =
+        new AndroidInitializationSettings('ic_launcher');
+    // IOS not needed
+    final initializationSettingsIOS = IOSInitializationSettings();
+    final initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (_) => _onSelectNotification());
+    return null;
+  }
+
   Scaffold _buildApp(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -158,28 +162,12 @@ class _AppState extends State<App> {
     );
   }
 
-  /// Called once from init state to check if the app was launched from notification
-  /// And if so validate that the pill was taken
-  void _lanchedFromNotif(BuildContext context) async {
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        sl<FlutterLocalNotificationsPlugin>();
-    final notificationAppLaunchDetails =
-        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-
-    if (notificationAppLaunchDetails.didNotificationLaunchApp) {
-      print('launched from notif');
-      _pageController.animateToPage(
-        3,
-        duration: Duration(seconds: 1),
-        curve: Curves.linear,
-      );
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _lanchedFromNotif(context);
+    _initLocalNotif(
+      flutterLocalNotificationsPlugin: sl<FlutterLocalNotificationsPlugin>(),
+    );
   }
 
   @override
