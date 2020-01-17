@@ -11,17 +11,6 @@ import '../../domain/entities/f_pill_entity.dart';
 import '../bloc/prescriptions_bloc.dart';
 import '../bloc/prescriptions_event.dart';
 
-// class FPrescFormWidget extends StatefulWidget {
-//   final FPPillEntity pillEntity;
-//   final String title;
-
-//   FPrescFormWidget({Key key, @required this.title, this.pillEntity})
-//       : super(key: key);
-
-//   @override
-//   _FPrescFormWidgetState createState() => _FPrescFormWidgetState();
-// }
-
 class FPrescFormWidgetState {
   final FPPillEntity pillEntity;
   final String title;
