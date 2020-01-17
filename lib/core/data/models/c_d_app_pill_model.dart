@@ -10,7 +10,7 @@ class CDAppPillModel {
   final int qtyToTake;
   final int remindAt;
   final DateTime remindWhen;
-  final bool taken;
+  bool taken;
 
   CDAppPillModel(
       {@required this.pillName,
