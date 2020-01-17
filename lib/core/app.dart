@@ -68,7 +68,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _selectedItem = 0;
-  int last_page = 0;
+
   PageController _pageController = PageController();
 
   final List<Widget> pageViews = <Widget>[
@@ -139,7 +139,6 @@ class _AppState extends State<App> {
         },
         children: pageViews,
       ),
-      //TODO change bottom nav bar
       bottomNavigationBar: BottomNavyBar(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         selectedIndex: _selectedItem,
@@ -168,6 +167,7 @@ class _AppState extends State<App> {
         await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
 
     if (notificationAppLaunchDetails.didNotificationLaunchApp) {
+      print('launched from notif');
       _pageController.animateToPage(
         3,
         duration: Duration(seconds: 1),
