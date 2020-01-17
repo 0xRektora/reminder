@@ -36,7 +36,7 @@ class _FPrescTileWidgetState extends State<FPrescTileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       child: Slidable(
         actionExtentRatio: 0.25,
         actionPane: SlidableDrawerActionPane(),
