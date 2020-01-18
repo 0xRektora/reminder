@@ -1,4 +1,6 @@
 # Miscellaneous
+package-lock.json
+package.json
 *.properties
 *.lock
 *.class
