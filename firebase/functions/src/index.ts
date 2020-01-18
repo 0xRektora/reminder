@@ -12,18 +12,6 @@ const DB_NAME = "prescriptions";
 
 // To delete
 // firestore:delete --all-collections --project reminder-53ebc
-exports.createUser = functions.firestore
-    .document('prescriptions/{userId}')
-    .onCreate(async (snap, context) => {
-        console.log("onCreate" + context.params.userId);
-
-        const today = new Date();
-        const date = today.getFullYear() + '-' + today.getMonth() + '-' + today.getDate();
-        const creationDate = {
-            "creationDate": date,
-        };
-        await snap.ref.set(creationDate, { merge: true });
-    });
 
 
 export const initDb = functions.https.onRequest(async (request, response) => {
