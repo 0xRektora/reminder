@@ -1,11 +1,13 @@
 import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:reminder/core/static/c_s_shared_prefs.dart';
-import 'package:reminder/core/usecases/usecase.dart';
-import 'package:reminder/features/login/domain/usecases/login_with_google.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import './bloc.dart';
+import '../../../../core/static/c_s_shared_prefs.dart';
+import '../../../../core/usecases/usecase.dart';
+import '../../domain/usecases/login_with_google.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final LoginWithGoogle loginWithGoogle;
@@ -23,6 +25,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final usecase = await loginWithGoogle(NoParams());
       yield* usecase.fold(
         (failure) async* {
+          print(failure.message);
           yield ErrorLoginState(message: "Can't login");
         },
         (user) async* {

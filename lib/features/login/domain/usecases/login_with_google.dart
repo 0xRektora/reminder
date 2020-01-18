@@ -1,11 +1,10 @@
 import 'package:dartz/dartz.dart';
-import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:reminder/core/usecases/usecase.dart';
 
 import '../../../../core/data/user.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../repositories/login_repository.dart';
 
 class LoginWithGoogle implements Usecase<User, NoParams> {
