@@ -1,5 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
+import 'package:reminder/features/calendar/data/datasources/f_c_pill_history_datasource.dart';
+import 'package:reminder/features/calendar/data/repositories/f_calendar_repo_impl.dart';
+import 'package:reminder/features/calendar/domain/repositories/f_calendar_repo.dart';
 
 import 'core/bloc/app_bloc.dart';
 import 'core/data/datasources/c_d_pill_datasource.dart';
@@ -10,6 +13,7 @@ import 'core/usecases/c_app_all_pill_usecase.dart';
 import 'core/usecases/c_app_delete_pill_usecase.dart';
 import 'core/usecases/c_app_get_pill_usecase.dart';
 import 'core/utils/c_app_shared_pref_manager.dart';
+import 'features/calendar/domain/usecases/f_c_get_day_pill_history_usecase.dart';
 import 'features/calendar/presentation/bloc/bloc.dart';
 import 'features/login/data/datasources/login_data_source.dart';
 import 'features/login/data/repositories/login_repository_impl.dart';
@@ -187,8 +191,30 @@ Future<void> fLogin() async {
 }
 
 Future<void> fCalendar() async {
-  // TODO makes concordant changes
-
   // Bloc
-  sl.registerFactory(() => CalendarBloc(sl()));
+  sl.registerFactory<CalendarBloc>(
+    () => CalendarBloc(
+      cAppAllPillUsecase: sl(),
+      getDayPillHistoryUsecase: sl(),
+    ),
+  );
+
+  // Usecases
+  sl.registerLazySingleton<FCGetDayPillHistoryUsecase>(
+    () => FCGetDayPillHistoryUsecase(
+      calendarRepo: sl(),
+    ),
+  );
+
+  // Repo
+  sl.registerLazySingleton<FCalendarRepo>(
+    () => FCalendarRepoImpl(
+      pillHistoryDatasource: sl(),
+    ),
+  );
+
+  // Datasource
+  sl.registerLazySingleton<FCPillHistoryDatasource>(
+    () => FCPillHistoryDatasourceImpl(),
+  );
 }
