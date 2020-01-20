@@ -37,15 +37,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
   void _buildMonthlyEvents(List<FPPillEntity> prescriptionsEvents) {}
 
-  BlocBuilder _blocBuilder(BuildContext context) {
-    return BlocBuilder<CalendarBloc, CalendarState>(
-      builder: (BuildContext context, CalendarState state) {
-        if (state is InitialCalendarState) _initialCalendarState(context);
-        return _buildPage(context);
-      },
-    );
-  }
-
   void _initialCalendarState(BuildContext context) {
     final appState = BlocProvider.of<AppBloc>(context).state;
     if (appState is AppLoggedState) {
@@ -55,11 +46,14 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  void _allPillCalendarState(
-    BuildContext context,
-    FCalendarAllPillState state,
-  ) {
-    print(state.pillEntity);
+  BlocBuilder _blocBuilder(BuildContext context) {
+    return BlocBuilder<CalendarBloc, CalendarState>(
+      builder: (BuildContext context, CalendarState state) {
+        // TODO Uncomment
+        if (state is InitialCalendarState) _initialCalendarState(context);
+        return _buildPage(context);
+      },
+    );
   }
 
   BlocListener _blocListener(
@@ -68,8 +62,24 @@ class _CalendarPageState extends State<CalendarPage> {
   ) {
     return BlocListener<CalendarBloc, CalendarState>(
       listener: (BuildContext context, CalendarState state) {
-        if (state is FCalendarAllPillState)
-          _allPillCalendarState(context, state);
+        // TODO remove
+        // test case
+        if (state is InitialCalendarState) {}
+        if (state is FCalendarAllPillState) {
+          print("InitialCalendarState");
+          final appState = BlocProvider.of<AppBloc>(context).state;
+          if (appState is AppLoggedState) {
+            final now = DateTime.now();
+            final today = "${now.year}-${now.month}-${now.day}";
+
+            BlocProvider.of<CalendarBloc>(context).add(
+              FCalendarDayPillHistoryEvent(
+                date: today,
+                uid: appState.user.uid,
+              ),
+            );
+          }
+        }
       },
       child: _blocBuilder(context),
     );
