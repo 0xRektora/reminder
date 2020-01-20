@@ -16,3 +16,19 @@ class FCalendarAllPillEvent extends CalendarEvent {
   @override
   List<Object> get props => [uid];
 }
+
+class FCalendarDayPillHistoryEvent extends CalendarEvent {
+  final String uid;
+  final String date;
+
+  FCalendarDayPillHistoryEvent({
+    @required this.uid,
+    @required this.date,
+  });
+
+  @override
+  List<Object> get props => [
+        uid,
+        date,
+      ];
+}
