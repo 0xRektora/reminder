@@ -10,13 +10,37 @@ abstract class FCPillHistoryDatasource {
     @required String uid,
   });
   Future<List<FCPillHistoryModel>> getMonthPillHistory({
-    @required String date,
+    @required int year,
+    @required int month,
     @required String uid,
   });
 }
 
 class FCPillHistoryDatasourceImpl implements FCPillHistoryDatasource {
-  // TODO rework, nonsense
+  /// Return a list of [String ] of the pill names saved on the db
+  ///
+  /// Takes a [String] {uid} as param
+  Future<List<String>> _getPillNames({
+    @required String uid,
+  }) async {
+    // Get a list documents of pills
+    final pillDocuments = await Firestore.instance
+        .collection(CSDbRoutes.PRESCRIPTIONS)
+        .document(uid)
+        .collection(CSDbPillDoc.PATH)
+        .getDocuments();
+
+    // contains registered pill names
+    final List<String> pillNames = [];
+
+    // populate {pillNames}
+    for (DocumentSnapshot pillDoc in pillDocuments.documents) {
+      pillNames.add(pillDoc.documentID);
+    }
+
+    return pillNames;
+  }
+
   /// return a [FCPillHistoryModel] of the chosen day
   ///
   /// Params:
@@ -36,20 +60,9 @@ class FCPillHistoryDatasourceImpl implements FCPillHistoryDatasource {
       final String month = splittedDate[1];
       final String day = splittedDate[2];
 
-      // Get a list documents of pills
-      final pillDocuments = await Firestore.instance
-          .collection(CSDbRoutes.PRESCRIPTIONS)
-          .document(uid)
-          .collection(CSDbPillDoc.PATH)
-          .getDocuments();
-
-      // contains registered pill names
-      final List<String> pillNames = [];
-
-      // populate {pillNames}
-      for (DocumentSnapshot pillDoc in pillDocuments.documents) {
-        pillNames.add(pillDoc.documentID);
-      }
+      final List<String> pillNames = await _getPillNames(
+        uid: uid,
+      );
 
       // list of [FCPillHistoryModel]
       final List<FCPillHistoryModel> pillHistoryModels = [];
@@ -83,20 +96,36 @@ class FCPillHistoryDatasourceImpl implements FCPillHistoryDatasource {
     }
   }
 
-  /// return a [List<FCPillHistoryModel>] of the chosen month
-  ///
-  /// Params:
-  ///
-  /// [String] date : format yyyy-mm
-  ///
-  /// [String] uid
+  /// Return a list of [FCPillHistoryModel]
   @override
   Future<List<FCPillHistoryModel>> getMonthPillHistory({
-    @required String date,
+    @required int year,
+    @required int month,
     @required String uid,
   }) async {
-    try {} on Exception catch (e) {
-      print("f_c_pill_history_datasource/getMonthPillHistory :" + e.toString());
+    try {
+      // The list of [FCPillHistoryModel] that we'll return
+      final List<FCPillHistoryModel> monthPillHistory = [];
+
+      // Get the names of pill saved on the DB
+      final List<String> pillNames = await _getPillNames(
+        uid: uid,
+      );
+
+      // for each pill
+      for (String pillName in pillNames) {
+        final snapshotEntries = await Firestore.instance
+            .collection(CSDbRoutes.PRESCRIPTIONS)
+            .document(uid)
+            .collection(CSDbRoutes.EVENTS)
+            .document(pillName)
+            .collection(year.toString())
+            .document(month.toString())
+            .get();
+      }
+
+      return monthPillHistory;
+    } on Exception catch (e) {
       throw ServerException(message: e.toString());
     }
   }
