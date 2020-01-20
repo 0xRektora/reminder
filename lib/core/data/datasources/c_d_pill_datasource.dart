@@ -33,8 +33,6 @@ abstract class CDPillDatasource {
   });
 }
 
-// TODO rework the function for managing the backend path
-
 class CDPillDatasourceImpl implements CDPillDatasource {
   @override
   Future<bool> addPill(
@@ -100,6 +98,9 @@ class CDPillDatasourceImpl implements CDPillDatasource {
     }
   }
 
+  /// param :
+  ///
+  /// [String] date : format yyyy-mm-dd
   @override
   Future<bool> validatePill({
     String uid,
@@ -107,13 +108,20 @@ class CDPillDatasourceImpl implements CDPillDatasource {
     String date,
   }) async {
     try {
+      final List<String> splittedDate = date.split("-");
+      final String year = splittedDate[0];
+      final String month = splittedDate[1];
+      final String day = splittedDate[2];
+
       await Firestore.instance
           .collection(CSDbRoutes.PRESCRIPTIONS)
           .document(uid)
           .collection(CSDbPillHistoryDoc.PATH)
-          .document(date)
-          .collection(CSDbPillDoc.PATH)
           .document(appPillModel.pillName)
+          .collection(year)
+          .document(month)
+          .collection(day)
+          .document(date)
           .setData(appPillModel.toDoc());
       return true;
     } on ServerException catch (e) {
@@ -131,13 +139,20 @@ class CDPillDatasourceImpl implements CDPillDatasource {
     @required String pillName,
   }) async {
     try {
+      final List<String> splittedDate = date.split("-");
+      final String year = splittedDate[0];
+      final String month = splittedDate[1];
+      final String day = splittedDate[2];
+
       final snapshotData = await Firestore.instance
           .collection(CSDbRoutes.PRESCRIPTIONS)
           .document(uid)
           .collection(CSDbPillHistoryDoc.PATH)
-          .document(date)
-          .collection(CSDbPillDoc.PATH)
           .document(pillName)
+          .collection(year)
+          .document(month)
+          .collection(day)
+          .document(date)
           .get();
       if (snapshotData.exists) {
         final CDAppPillModel appPillModel =

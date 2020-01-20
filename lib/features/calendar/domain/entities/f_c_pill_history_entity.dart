@@ -1,11 +1,11 @@
 import '../../../prescriptions/domain/entities/f_pill_entity.dart';
 
 class FCPillHistoryEntity {
-  final int day;
+  final String date;
   final FPPillEntity fpPillEntity;
 
   FCPillHistoryEntity({
-    this.day,
+    this.date,
     this.fpPillEntity,
   });
 }
