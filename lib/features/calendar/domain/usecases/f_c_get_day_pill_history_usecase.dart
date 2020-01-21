@@ -20,10 +20,7 @@ class FCGetDayPillHistoryUsecase
   Future<Either<Failure, List<FCPillHistoryEntity>>> call(
     FCGetDayPillHistoryParam param,
   ) {
-    return calendarRepo.getDayPillHistory(
-      date: param.date,
-      uid: param.uid,
-    );
+    return null;
   }
 }
 

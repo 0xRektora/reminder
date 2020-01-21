@@ -17,49 +17,6 @@ class FCalendarRepoImpl implements FCalendarRepo {
   });
 
   @override
-  Future<Either<Failure, List<FCPillHistoryEntity>>> getDayPillHistory({
-    @required String date,
-    @required String uid,
-  }) async {
-    try {
-      // Get a list of [FCPillHistoryModel] of occured events
-      final List<FCPillHistoryModel> listModel =
-          await pillHistoryDatasource.getDayPillHistory(
-        date: date,
-        uid: uid,
-      );
-
-      // contains the {listModel} casted to [FCPillHistoryEntity]
-      final List<FCPillHistoryEntity> listEntity = [];
-
-      // Populae {listEntity}
-      for (FCPillHistoryModel model in listModel) {
-        final FPPillEntity pillEntity = FPPillEntity(
-          current: model.pillModel.current,
-          pillName: model.pillModel.pillName,
-          qtyToTake: model.pillModel.qtyToTake,
-          remindAt: model.pillModel.remindAt,
-          remindWhen: model.pillModel.remindWhen,
-          taken: model.pillModel.taken,
-          total: model.pillModel.total,
-        );
-        final FCPillHistoryEntity pillHistoryEntity = FCPillHistoryEntity(
-          date: date,
-          fpPillEntity: pillEntity,
-        );
-
-        listEntity.add(pillHistoryEntity);
-      }
-
-      return Right(listEntity);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } on Exception catch (e) {
-      return Left(ServerFailure(message: e.toString()));
-    }
-  }
-
-  @override
   Future<Either<Failure, Map<String, List<FCPillHistoryEntity>>>>
       getMonthPillHistory({
     @required String uid,

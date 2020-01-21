@@ -1,15 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
+import 'package:reminder/core/data/models/c_d_app_pill_model.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/static/c_s_db_routes.dart';
 import '../models/f_c_pill_history_model.dart';
 
 abstract class FCPillHistoryDatasource {
-  Future<List<FCPillHistoryModel>> getDayPillHistory({
-    @required String date,
-    @required String uid,
-  });
   Future<List<FCPillHistoryModel>> getMonthPillHistory({
     @required String uid,
     @required int year,
@@ -43,63 +40,6 @@ class FCPillHistoryDatasourceImpl implements FCPillHistoryDatasource {
     return pillNames;
   }
 
-  // TODO Rework
-  /// return a [FCPillHistoryModel] of the chosen day
-  ///
-  /// Params:
-  ///
-  /// [String] date : format yyyy-mm-dd
-  ///
-  /// [String] uid
-  @override
-  Future<List<FCPillHistoryModel>> getDayPillHistory({
-    @required String date,
-    @required String uid,
-  }) async {
-    try {
-      // Split the date
-      final List<String> splittedDate = date.split("-");
-      final String year = splittedDate[0];
-      final String month = splittedDate[1];
-      final String day = splittedDate[2];
-
-      final List<String> pillNames = await _getPillNames(
-        uid: uid,
-      );
-
-      // list of [FCPillHistoryModel]
-      final List<FCPillHistoryModel> pillHistoryModels = [];
-
-      // populate {pillHistoryModels}
-      for (String pillName in pillNames) {
-        final DocumentSnapshot queryDocument = await Firestore.instance
-            .collection(CSDbRoutes.PRESCRIPTIONS)
-            .document(uid)
-            .collection(CSDbRoutes.EVENTS)
-            .document(pillName)
-            .collection(year)
-            .document(month)
-            .get();
-
-        final FCPillHistoryModel pillHistorymodel =
-            FCPillHistoryModel.fromSnapshot(
-          year: int.parse(year),
-          month: int.parse(month),
-          day: int.parse(day),
-          jsonPillModel: queryDocument.data,
-        );
-
-        pillHistoryModels.add(pillHistorymodel);
-      }
-
-      return pillHistoryModels;
-    } on Exception catch (e) {
-      print("f_c_pill_history_datasource/getDayPillHistory :" + e.toString());
-      throw ServerException(message: e.toString());
-    }
-  }
-
-  // TODO Rework
   /// Return a list of [FCPillHistoryModel]
   @override
   Future<List<FCPillHistoryModel>> getMonthPillHistory({
@@ -123,8 +63,28 @@ class FCPillHistoryDatasourceImpl implements FCPillHistoryDatasource {
             .collection(CSDbRoutes.PRESCRIPTIONS)
             .document(uid)
             .collection(CSDbRoutes.EVENTS)
-            .getDocuments();
+            .document(pillName)
+            .collection(year.toString())
+            .document(month.toString())
+            .get();
+
+        for (String day in snapshotEntries.data.keys) {
+          final Map<String, dynamic> snapshotData =
+              (snapshotEntries.data[day][pillName] as Map<dynamic, dynamic>)
+                  .cast<String, dynamic>();
+          final CDAppPillModel pillModel =
+              CDAppPillModel.fromSnapshot(snapshotData);
+
+          final FCPillHistoryModel pillHistoryModel = FCPillHistoryModel(
+            year: year,
+            month: month,
+            day: int.parse(day),
+            pillModel: pillModel,
+          );
+          monthPillHistory.add(pillHistoryModel);
+        }
       }
+      print(monthPillHistory.toString());
 
       return monthPillHistory;
     } on Exception catch (e) {
