@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meta/meta.dart';
 
+import '../../../features/calendar/data/models/f_c_pill_history_model.dart';
 import '../../error/exceptions.dart';
 import '../../static/c_s_db_routes.dart';
 import '../models/c_d_app_pill_model.dart';
@@ -28,8 +29,7 @@ abstract class CDPillDatasource {
   });
   Future<bool> validatePill({
     @required String uid,
-    @required CDAppPillModel appPillModel,
-    @required String date,
+    @required FCPillHistoryModel pillHistoryModel,
   });
 }
 
@@ -104,25 +104,17 @@ class CDPillDatasourceImpl implements CDPillDatasource {
   @override
   Future<bool> validatePill({
     String uid,
-    CDAppPillModel appPillModel,
-    String date,
+    FCPillHistoryModel pillHistoryModel,
   }) async {
     try {
-      final List<String> splittedDate = date.split("-");
-      final String year = splittedDate[0];
-      final String month = splittedDate[1];
-      final String day = splittedDate[2];
-
       await Firestore.instance
           .collection(CSDbRoutes.PRESCRIPTIONS)
           .document(uid)
           .collection(CSDbPillHistoryDoc.PATH)
-          .document(appPillModel.pillName)
-          .collection(year)
-          .document(month)
-          .collection(day)
-          .document(date)
-          .setData(appPillModel.toDoc());
+          .document(pillHistoryModel.pillModel.pillName)
+          .collection(pillHistoryModel.year.toString())
+          .document(pillHistoryModel.month.toString())
+          .setData(pillHistoryModel.toDoc());
       return true;
     } on ServerException catch (e) {
       throw ServerException(message: e.toString());
@@ -151,14 +143,24 @@ class CDPillDatasourceImpl implements CDPillDatasource {
           .document(pillName)
           .collection(year)
           .document(month)
-          .collection(day)
-          .document(date)
           .get();
-      if (snapshotData.exists) {
-        final CDAppPillModel appPillModel =
-            CDAppPillModel.fromSnapshot(snapshotData.data);
 
-        return appPillModel;
+      // Check if the snapshot exist
+      if (snapshotData.exists) {
+        final Map<dynamic, dynamic> mapDay = snapshotData.data[day];
+        // Check if the key {mapDay} exists
+        if (mapDay != null) {
+          final Map<String, dynamic> mapPill =
+              (snapshotData.data[day][pillName] as Map<dynamic, dynamic>)
+                  .cast<String, dynamic>();
+          // Check if the key {mapPill exists}
+          if (mapPill != null) {
+            final CDAppPillModel appPillModel =
+                CDAppPillModel.fromSnapshot(mapPill);
+
+            return appPillModel;
+          }
+        }
       } else {
         return null;
       }

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:reminder/features/calendar/data/models/f_c_pill_history_model.dart';
 
 import '../../../../core/data/datasources/c_d_pill_datasource.dart';
 import '../../../../core/data/models/c_d_app_pill_model.dart';
@@ -164,6 +165,14 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
         pillName: pillName,
       );
 
+      final DateTime now = DateTime.now();
+      final FCPillHistoryModel pillHistoryModel = FCPillHistoryModel(
+        year: now.year,
+        month: now.month,
+        day: now.day,
+        pillModel: cdAppPillModel,
+      );
+
       cdAppPillModel.taken = true;
 
       final String today = CAppConverter.fromDatetimeToString(DateTime.now());
@@ -174,9 +183,8 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
       );
 
       cdPillDatasource.validatePill(
-        appPillModel: cdAppPillModel,
         uid: uid,
-        date: today,
+        pillHistoryModel: pillHistoryModel,
       );
 
       await unsetSchedule(
