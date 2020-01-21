@@ -16,6 +16,8 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   CalendarController _calendarController;
+  Map<DateTime, List> pillEvents;
+
   @override
   void initState() {
     super.initState();
@@ -28,15 +30,58 @@ class _CalendarPageState extends State<CalendarPage> {
     super.dispose();
   }
 
+  Widget _dayBuilder(
+    BuildContext context,
+    DateTime dateTime,
+    List<dynamic> events,
+  ) {
+    return Container(
+      color: Colors.red,
+      child: Text(dateTime.day.toString()),
+    );
+  }
+
+  Widget _selectedDayBuilder(
+    BuildContext context,
+    DateTime dateTime,
+    List<dynamic> events,
+  ) {
+    return Container(
+      height: 5.0,
+      width: 5.0,
+      decoration: BoxDecoration(
+        color: Colors.blueAccent,
+        borderRadius: BorderRadius.circular(90.0),
+      ),
+      child: Center(
+        child: Text(
+          dateTime.day.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  CalendarBuilders _calendarBuilders() {
+    return CalendarBuilders(
+      // dayBuilder: _dayBuilder,
+      selectedDayBuilder: _selectedDayBuilder,
+    );
+  }
+
   Widget _buildPage(BuildContext context) {
     return TableCalendar(
-      availableCalendarFormats: {CalendarFormat.month: "month"},
+      availableCalendarFormats: {
+        CalendarFormat.month: "month",
+      },
       calendarController: _calendarController,
+      events: pillEvents,
+      builders: _calendarBuilders(),
     );
   }
 
   void _buildMonthlyEvents(
-    Map<String, List<FCPillHistoryEntity>> prescriptionsEvents,
+    List<FCPillHistoryEntity> prescriptionsEvents,
   ) {}
 
   void _initialCalendarState(BuildContext context) {

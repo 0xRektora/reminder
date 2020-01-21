@@ -20,7 +20,6 @@ class FReminderScheduleRepoImpl implements FReminderScheduleRepo {
     @required this.cdPillDatasource,
   });
 
-  // TODO fix the recursion if changing a notification the notification changed for all
   @override
   Future<Either<Failure, bool>> setSchedule({
     Time time,
