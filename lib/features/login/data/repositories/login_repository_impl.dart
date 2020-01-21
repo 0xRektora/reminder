@@ -5,8 +5,10 @@ import 'package:meta/meta.dart';
 import 'package:reminder/core/data/user.dart';
 import 'package:reminder/core/error/exceptions.dart';
 import 'package:reminder/core/error/failures.dart';
+import 'package:reminder/core/static/c_s_shared_prefs.dart';
 import 'package:reminder/features/login/data/datasources/login_data_source.dart';
 import 'package:reminder/features/login/domain/repositories/login_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginRepositoryImpl implements LoginRepository {
   // Return the FirebaseUser
@@ -53,7 +55,8 @@ class LoginRepositoryImpl implements LoginRepository {
   Future<Either<Failure, User>> loginFromCache(FirebaseAuth _auth) async {
     try {
       final user = await loginDataSource.loginFromCache(_auth);
-
+      final sh = await SharedPreferences.getInstance();
+      sh.setBool(CSSharedPrefs.FROM_CACHE, true);
       return right(user);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

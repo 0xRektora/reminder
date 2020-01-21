@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:meta/meta.dart';
+import 'package:reminder/core/static/c_s_shared_prefs.dart';
 import 'package:reminder/features/reminder_schedule/domain/usecases/f_reminder_schedule_unset_usecase.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './bloc.dart';
 import '../../../../core/usecases/c_app_add_pill_usecase.dart';
@@ -85,8 +87,12 @@ class PrescriptionsBloc extends Bloc<PrescriptionsEvent, PrescriptionsState> {
           yield FPrescLoadingState();
           yield FprescListPillState(allPill: allPills);
 
-          // Set the alarm
-          allPills.forEach(_reminderSetSchedule);
+          // Set the alarm if first login state
+          final sh = await SharedPreferences.getInstance();
+          if (!sh.getBool(CSSharedPrefs.FROM_CACHE)) {
+            print("INIT ALL NOTIFICATION / FIRST LOGIN");
+            allPills.forEach(_reminderSetSchedule);
+          }
         },
       );
     }
