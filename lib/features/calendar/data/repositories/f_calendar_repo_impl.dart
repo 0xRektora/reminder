@@ -62,13 +62,19 @@ class FCalendarRepoImpl implements FCalendarRepo {
   @override
   Future<Either<Failure, Map<String, List<FCPillHistoryEntity>>>>
       getMonthPillHistory({
-    @required String creationDate,
+    @required String uid,
     @required int year,
     @required int month,
-    @required String uid,
+    @required String creationDate,
   }) async {
     try {
       final Map<String, List<FCPillHistoryEntity>> entries = {};
+      pillHistoryDatasource.getMonthPillHistory(
+        uid: uid,
+        year: year,
+        month: month,
+        creationDate: creationDate,
+      );
       return Right(entries);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

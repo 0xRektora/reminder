@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reminder/core/bloc/bloc.dart';
-import 'package:reminder/features/calendar/presentation/bloc/bloc.dart';
-import 'package:reminder/features/prescriptions/domain/entities/f_pill_entity.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../../../core/bloc/bloc.dart';
 import '../../../../dependency_injector.dart';
+import '../../domain/entities/f_c_pill_history_entity.dart';
+import '../bloc/bloc.dart';
 
 class CalendarPage extends StatefulWidget {
   CalendarPage({Key key}) : super(key: key);
@@ -35,21 +35,35 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  void _buildMonthlyEvents(List<FPPillEntity> prescriptionsEvents) {}
+  void _buildMonthlyEvents(
+    Map<String, List<FCPillHistoryEntity>> prescriptionsEvents,
+  ) {}
 
   void _initialCalendarState(BuildContext context) {
     final appState = BlocProvider.of<AppBloc>(context).state;
     if (appState is AppLoggedState) {
+      final DateTime now = DateTime.now();
+
       final String uid = appState.user.uid;
-      BlocProvider.of<CalendarBloc>(context)
-          .add(FCalendarAllPillEvent(uid: uid));
+      final int year = now.year;
+      final int month = now.month;
+      final String creationDate = appState.user.creationDate;
+
+      final FCalendarMonthPillHistoryEvent monthPillHistoryEvent =
+          FCalendarMonthPillHistoryEvent(
+        uid: uid,
+        year: year,
+        month: month,
+        creationDate: creationDate,
+      );
+
+      BlocProvider.of<CalendarBloc>(context).add(monthPillHistoryEvent);
     }
   }
 
   BlocBuilder _blocBuilder(BuildContext context) {
     return BlocBuilder<CalendarBloc, CalendarState>(
       builder: (BuildContext context, CalendarState state) {
-        // TODO Uncomment
         if (state is InitialCalendarState) _initialCalendarState(context);
         return _buildPage(context);
       },
@@ -65,20 +79,8 @@ class _CalendarPageState extends State<CalendarPage> {
         // TODO remove
         // test case
         if (state is InitialCalendarState) {}
-        if (state is FCalendarAllPillState) {
-          print("InitialCalendarState");
-          final appState = BlocProvider.of<AppBloc>(context).state;
-          if (appState is AppLoggedState) {
-            final now = DateTime.now();
-            final today = "${now.year}-${now.month}-${now.day}";
-
-            BlocProvider.of<CalendarBloc>(context).add(
-              FCalendarDayPillHistoryEvent(
-                date: today,
-                uid: appState.user.uid,
-              ),
-            );
-          }
+        if (state is FCalendarMonthPillHistoryState) {
+          print(state.listPillHistory);
         }
       },
       child: _blocBuilder(context),

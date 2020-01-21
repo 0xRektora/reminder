@@ -32,3 +32,25 @@ class FCalendarDayPillHistoryEvent extends CalendarEvent {
         date,
       ];
 }
+
+class FCalendarMonthPillHistoryEvent extends CalendarEvent {
+  final String uid;
+  final int year;
+  final int month;
+  final String creationDate;
+
+  FCalendarMonthPillHistoryEvent({
+    @required this.uid,
+    @required this.year,
+    @required this.month,
+    @required this.creationDate,
+  });
+
+  @override
+  List<Object> get props => [
+        uid,
+        year,
+        month,
+        creationDate,
+      ];
+}
