@@ -3,30 +3,41 @@ import 'package:meta/meta.dart';
 import '../../../../core/data/models/c_d_app_pill_model.dart';
 
 class FCPillHistoryModel {
-  final String date;
+  final int year;
+  final int month;
+  final int day;
   final CDAppPillModel pillModel;
 
   FCPillHistoryModel({
-    this.date,
-    this.pillModel,
+    @required this.year,
+    @required this.month,
+    @required this.day,
+    @required this.pillModel,
   });
 
   Map<String, dynamic> toDoc() {
-    final Map<String, dynamic> doc = this.pillModel.toDoc()
-      ..addAll({
-        'date': this.date,
-      });
-
+    final Map<String, dynamic> doc = {
+      '$day': {
+        '${pillModel.pillName}': this.pillModel.toDoc(),
+      },
+    };
     return doc;
   }
 
   factory FCPillHistoryModel.fromSnapshot({
-    @required String date,
+    @required int year,
+    @required int month,
+    @required int day,
     @required Map<String, dynamic> jsonPillModel,
   }) {
     final CDAppPillModel appPillModel =
         CDAppPillModel.fromSnapshot(jsonPillModel);
 
-    return FCPillHistoryModel(date: date, pillModel: appPillModel);
+    return FCPillHistoryModel(
+      year: year,
+      month: month,
+      day: day,
+      pillModel: appPillModel,
+    );
   }
 }
