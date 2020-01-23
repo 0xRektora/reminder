@@ -41,6 +41,9 @@ class LoginRepositoryImpl implements LoginRepository {
         );
       }
 
+      final sh = await SharedPreferences.getInstance();
+      await sh.setBool(CSSharedPrefs.FROM_CACHE, false);
+
       return Right(user);
     } on ServerException catch (e) {
       print('ServerException LoginRepositoryImpl:' + e.message);
@@ -56,7 +59,7 @@ class LoginRepositoryImpl implements LoginRepository {
     try {
       final user = await loginDataSource.loginFromCache(_auth);
       final sh = await SharedPreferences.getInstance();
-      sh.setBool(CSSharedPrefs.FROM_CACHE, true);
+      await sh.setBool(CSSharedPrefs.FROM_CACHE, true);
       return right(user);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
